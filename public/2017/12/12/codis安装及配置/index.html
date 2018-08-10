@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="codis安装及配置一、环境安装系统环境centos  Golang 环境搭建: yum install go  codis 下载和编译: go get -u -d github.com/CodisLabs/codiscd $GOPATH/src/github.com/CodisLabs/codismakemake gotestmkdir -p /usr/local/codis/{logs,con">
+<meta name="keywords" content="codis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="codis安装及配置">
+<meta property="og:url" content="http://zhqqqy.github.io/2017/12/12/codis安装及配置/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="codis安装及配置一、环境安装系统环境centos  Golang 环境搭建: yum install go  codis 下载和编译: go get -u -d github.com/CodisLabs/codiscd $GOPATH/src/github.com/CodisLabs/codismakemake gotestmkdir -p /usr/local/codis/{logs,con">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/addgroup.jpg">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/rebalance_slots.jpg">
+<meta property="og:updated_time" content="2018-08-10T03:05:20.414Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="codis安装及配置">
+<meta name="twitter:description" content="codis安装及配置一、环境安装系统环境centos  Golang 环境搭建: yum install go  codis 下载和编译: go get -u -d github.com/CodisLabs/codiscd $GOPATH/src/github.com/CodisLabs/codismakemake gotestmkdir -p /usr/local/codis/{logs,con">
+<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/addgroup.jpg">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>codis安装及配置 | Hexo</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-codis安装及配置" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/12/12/codis安装及配置/" class="article-date">
+      <time datetime="2017-12-12T08:21:21.000Z" itemprop="datePublished">2017-12-12</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      codis安装及配置
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/redis/">redis</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/codis/">codis</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="codis安装及配置"><a href="#codis安装及配置" class="headerlink" title="codis安装及配置"></a>codis安装及配置</h1><h2 id="一、环境安装"><a href="#一、环境安装" class="headerlink" title="一、环境安装"></a>一、环境安装</h2><p><strong>系统环境centos</strong></p>
+<ol>
+<li><p>Golang 环境搭建: yum install go</p>
+</li>
+<li><p>codis 下载和编译:</p>
+<p>go get -u -d github.com/CodisLabs/codis<br>cd $GOPATH/src/github.com/CodisLabs/codis<br>make<br>make gotest<br>mkdir -p /usr/local/codis/{logs,conf,scripts}<br>cp –rf bin /usr/local/codis/<br>cp config.ini /usr/local/codis/conf/</p>
+</li>
+</ol>
+<ol start="3">
+<li><p>Codis-HA 编译<br>Codis-HA。这是一个通过 Codis 开放的 api 实现自动切换主从的工具。该工具会在检测<br>到 master 挂掉的时候将其下线并选择其中一个 slave 提升为 master 继续提供服务。<br>go get github.com/ngaut/codis-ha<br>cd codis-ha<br>go build<br>codis-ha –codis-config=localhost:18087 –productName=test</p>
+</li>
+<li><p>Zookeeper集群搭建</p>
+<p>首先安装开发工具及openjdk，zookeeper是由Java语言开发的，所以需要openjdk环境。</p>
+</li>
+</ol>
+<p>首先安装开发工具及openjdk，zookeeper是由Java语言开发的，所以需要openjdk环境。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum groupinstall &quot;Development tools&quot; &quot;Compatibility libraries&quot; -y </span><br><span class="line">yum install openssl-devel openssl -y</span><br><span class="line">yum install java-1.8.0-openjdk-devel java-1.8.0-openjdk -y</span><br></pre></td></tr></table></figure>
+<p>确定Java运行环境正常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line">  openjdk version &quot;1.8.0101&quot;</span><br><span class="line">  OpenJDK Runtime Environment (build 1.8.0101-b13)</span><br><span class="line">  OpenJDK 64-Bit Server VM (build 25.101-b13, mixed mode)</span><br></pre></td></tr></table></figure>
+<p>安装二进制版本的zookeeper</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tar xvf zookeeper-3.4.9.tar.gz -C /usr/local/ </span><br><span class="line">ln -s /usr/local/zookeeper-3.4.9/ /usr/local/zookeeper </span><br><span class="line">cd /usr/local/zookeeper/conf </span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br></pre></td></tr></table></figure>
+<p>编译zookeeper配置文件/usr/local/zookeeper/conf/zoo.cfg</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">maxClientCnxns=60</span><br><span class="line">tickTime=2000</span><br><span class="line">initLimit=10</span><br><span class="line">syncLimit=5</span><br><span class="line">dataDir=/data/zookeeper/db</span><br><span class="line">dataLogDir=/data/zookeeper/log</span><br><span class="line">clientPort=2181</span><br><span class="line"># cluster configure</span><br><span class="line">server.1=10.173.225.60:2888:3888</span><br><span class="line">server.2=10.174.33.81:2888:3888</span><br><span class="line">server.3=10.173.224.34:2888:3888</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /data/zookeeper/&#123;db,log&#125; -p</span><br></pre></td></tr></table></figure>
+<p>其中2888表示zookeeper程序监听端口，3888表示zookeeper选举通信端口。</p>
+<p>下面需要生成ID，这里需要注意，myid对应的zoo.cfg的server.ID，比如第二台zookeeper主机对应的myid应该是2，以此类推，三个主机分别为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">10.173.225.60 echo 1 &gt; /data/zookeeper/db/myid</span><br><span class="line">10.174.33.81 echo 2 &gt; /data/zookeeper/db/myid</span><br><span class="line">10.173.224.34 echo 3 &gt; /data/zookeeper/db/myid</span><br></pre></td></tr></table></figure>
+<p>然后输出环境变量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/usr/local/zookeeper/bin/</span><br><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
+<p>然后就可以启动zookeeper了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zkServer.sh start</span><br></pre></td></tr></table></figure>
+<p>查看各个zookeeper节点的状态（会有一个leader节点，两个follower节点）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 ~]# zkServer.sh status </span><br><span class="line">	Mode: follower</span><br><span class="line">[root@node2 ~]# zkServer.sh status </span><br><span class="line">	Mode: leader</span><br><span class="line">[root@node3 ~]# zkServer.sh status </span><br><span class="line">	Mode: follower</span><br></pre></td></tr></table></figure>
+<p>客户端连接，可以查看相关信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zkCli.sh -server 127.0.0.1:2181</span><br></pre></td></tr></table></figure>
+<p>至此，zookeeper已经搞定了。</p>
+<h2 id="二、启动服务"><a href="#二、启动服务" class="headerlink" title="二、启动服务"></a>二、启动服务</h2><p>再编译后的codis文件夹下有启动服务的脚本</p>
+<h3 id="启动codis-dashboard"><a href="#启动codis-dashboard" class="headerlink" title="启动codis-dashboard"></a>启动codis-dashboard</h3><p>使用 <code>codis-dashboard-admin.sh</code> 脚本启动 dashboard，并查看 dashboard 日志确认启动是否有异常。</p>
+<p>dashboard只需要启动一个</p>
+<p>配置文件dashboard.toml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># Set Coordinator, only accept &quot;zookeeper&quot; &amp; &quot;etcd&quot; &amp; &quot;filesystem&quot;.</span><br><span class="line"># for zookeeper/etcd, coorinator_auth accept &quot;user:password&quot;</span><br><span class="line"># Quick Start</span><br><span class="line">coordinator_name = &quot;zookeeper&quot;</span><br><span class="line">coordinator_addr = &quot;10.173.225.60:2181,10.174.33.81:2181,10.173.224.34:2181&quot;</span><br><span class="line">#coordinator_name = &quot;zookeeper&quot;</span><br><span class="line">#coordinator_addr = &quot;127.0.0.1:2181&quot;</span><br><span class="line">#coordinator_auth = &quot;&quot;</span><br><span class="line"></span><br><span class="line"># Set Codis Product Name/Auth.</span><br><span class="line">product_name = &quot;codis-demo&quot;</span><br><span class="line">product_auth = &quot;&quot;</span><br><span class="line"></span><br><span class="line"># Set bind address for admin(rpc), tcp only.</span><br><span class="line">admin_addr = &quot;0.0.0.0:18080&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./admin/codis-dashboard-admin.sh start</span><br><span class="line"> tail -100 ./log/codis-dashboard.log.2017-04-08</span><br></pre></td></tr></table></figure>
+<h3 id="启动codis-fe"><a href="#启动codis-fe" class="headerlink" title="启动codis-fe"></a>启动codis-fe</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/codis-admin --dashboard-list --zookeeper=127.0.0.1:2181 | tee $Gopath/src/github.com/CodisLabs/codis/config/codis.json</span><br></pre></td></tr></table></figure>
+<p>codis.json</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">&#123;</span><br><span class="line">    &quot;name&quot;: &quot;codis-demo&quot;,</span><br><span class="line">    &quot;dashboard&quot;: &quot;10.174.33.81:18080&quot;</span><br><span class="line"> &#125;</span><br><span class="line"> ]</span><br></pre></td></tr></table></figure>
+<p>启动codis-fe</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nohup `which codis-fe` --ncpu=2 --log=/data/codis/log/fe.log --log-level=WARN </span><br><span class="line">--dashboard-list=$Gopath/src/github.com/CodisLabs/codis/config/codis.json --listen=0.0.0.0:8080 &amp;</span><br></pre></td></tr></table></figure>
+<h3 id="启动codis-proxy"><a href="#启动codis-proxy" class="headerlink" title="启动codis-proxy"></a>启动codis-proxy</h3><p>使用 <code>codis-proxy-admin.sh</code> 脚本启动 codis-proxy，并查看 proxy 日志确认启动是否有异常。(代理可以启动一个，也可以启动多个，但是启动的多个代理的配置必须是一样的，是同一个dashboard的地址)</p>
+<p>配置文件proxy.toml</p>
+<blockquote>
+<p>19 # Set bind address for admin(rpc), tcp only.</p>
+<p>20 admin_addr = “10.173.225.60:11080”<br>21<br>22 # Set bind address for proxy, proto_type can be “tcp”, “tcp4”, “tcp6”, “unix” or “unixpacket”.<br>23 proto_type = “tcp4”<br>24 proxy_addr = “10.173.225.60:19000”<br>26 # Set jodis address &amp; session timeout<br>27 # 1. jodis_name is short for jodis_coordinator_name, only accept “zookeeper” &amp; “etcd”.<br>28 # 2. jodis_addr is short for jodis_coordinator_addr<br>29 # 3. jodis_auth is short for jodis_coordinator_auth, for zookeeper/etcd, “user:password” is accepted.<br>30 # 4. proxy will be registered as node:<br>31 # if jodis<em>compatible = true (not suggested):32 # /zk/codis/db</em>{PRODUCT_NAME}/proxy-{HASHID} (compatible with Codis2.0)<br>33 # or else<br>34 # /jodis/{PRODUCT_NAME}/proxy-{HASHID}<br>35 jodis_name = “”<br>3 # jodis_addr不能写地址，不然启动报错，不知道为啥，可能没有安装jodis,<br>36 jodis_addr = “”<br>37 jodis_auth = “”<br>38 jodis_timeout = “20s”</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./admin/codis-proxy-admin.sh start</span><br><span class="line">tail -100 ./log/codis-proxy.log.2017-04-08</span><br></pre></td></tr></table></figure>
+<p>要启动多个代理需要修改脚本</p>
+<p>vi codis-proxy-admin.sh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CODIS_DASHBOARD_ADDR=&quot;10.173.225.60:18080&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="启动codis-server"><a href="#启动codis-server" class="headerlink" title="启动codis-server"></a>启动codis-server</h3><p>使用 <code>codis-server-admin.sh</code> 脚本启动 codis-server，并查看 redis 日志确认启动是否有异常。</p>
+<p>配置redis.conf 和sentinel.conf</p>
+<p><strong>redis.conf</strong></p>
+<blockquote>
+<p>48 # bind 127.0.0.1 ::1<br>49 #<br>50 # WARNING If the computer running Redis is directly exposed to the<br>51 # internet, binding to all the interfaces is dangerous and will expose the<br>52 # instance to everybody on the internet. So by default we uncomment the<br>53 # following bind directive, that will force Redis to listen only into<br>54 # the IPv4 lookback interface address (this means Redis will be able to<br>55 # accept connections only from clients running into the same computer it<br>56 # is running).<br>57 #<br>58 # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES<br>59 # JUST COMMENT THE FOLLOWING LINE.<br>60 # ~~<br>61 bind 0.0.0.0<br>…….<br>…….<br>82 # Accept connections on the specified port, default is 6379 (IANA #815344).<br>83 # If port 0 is specified Redis will not listen on a TCP socket.<br>84 port 6379</p>
+</blockquote>
+<p><strong>sentinel.conf</strong></p>
+<blockquote>
+<p>48 # bind 127.0.0.1 ::1<br>49 #<br>50 # WARNING If the computer running Redis is directly exposed to the<br>51 # internet, binding to all the interfaces is dangerous and will expose the<br>52 # instance to everybody on the internet. So by default we uncomment the<br>53 # following bind directive, that will force Redis to listen only into<br>54 # the IPv4 lookback interface address (this means Redis will be able to<br>55 # accept connections only from clients running into the same computer it<br>56 # is running).<br>57 #<br>58 # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES<br>59 # JUST COMMENT THE FOLLOWING LINE.<br>60 #~~<br>61 bind 0.0.0.0<br>…….<br>…….<br>82 # Accept connections on the specified port, default is 6379 (IANA #815344).<br>83 # If port 0 is specified Redis will not listen on a TCP socket.<br>84 port 26379</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./admin/codis-server-admin.sh start</span><br><span class="line">tail -100 /tmp/redis_6379.log</span><br></pre></td></tr></table></figure>
+<p>redis.conf 配置中 pidfile、logfile 默认保存在 <code>/tmp</code> 目录，若启动失败，请检查当前用户是否有该目录的读写权限。</p>
+<h3 id="通过fe添加group"><a href="#通过fe添加group" class="headerlink" title="通过fe添加group"></a>通过fe添加group</h3><p>通过web浏览器访问集群管理页面(fe地址:127.0.0.1:8080) 选择我们刚搭建的集群 codis-demo，在 Proxy 栏可看到我们已经启动的 Proxy， 但是 Group 栏为空，因为我们启动的 codis-server 并未加入到集群 添加 <code>NEW GROUP</code>，<code>NEW GROUP</code> 行输入 1，再点击 <code>NEW GROUP</code> 即可 添加 Codis Server，<code>Add Server</code> 行输入我们刚刚启动的 codis-server 地址，添加到我们刚新建的 Group，然后再点击 <code>Add Server</code> 按钮即可，如下图所示<br><img src="/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/addgroup.jpg" alt=""></p>
+<h3 id="通过fe初始化slot"><a href="#通过fe初始化slot" class="headerlink" title="通过fe初始化slot"></a>通过fe初始化slot</h3><p>新增的集群 slot 状态是 offline，因此我们需要对它进行初始化（将 1024 个 slot 分配到各个 group），而初始化最快的方法可通过 fe 提供的 <code>rebalance all slots</code> 按钮来做，如下图所示，点击此按钮，我们即快速完成了一个集群的搭建。<br><img src="/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/rebalance_slots.jpg" alt=""><br>每次增加组之后就需要重新执行<strong>Rebalance All Slots</strong></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/12/12/codis安装及配置/">codis安装及配置</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
+        <p><span>发布时间:</span>2017-12-12, 16:21:21</p>
+        <p><span>最后更新:</span>2018-08-10, 11:05:20</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/12/12/codis安装及配置/" title="codis安装及配置">http://zhqqqy.github.io/2017/12/12/codis安装及配置/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2017/12/12/codis安装及配置/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2017/12/29/redis集群安装/">
+                    redis集群安装
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/08/23/Go性能分析工具/">
+                    Go性能分析工具
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#codis安装及配置"><span class="toc-number">1.</span> <span class="toc-text">codis安装及配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、环境安装"><span class="toc-number">1.1.</span> <span class="toc-text">一、环境安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、启动服务"><span class="toc-number">1.2.</span> <span class="toc-text">二、启动服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#启动codis-dashboard"><span class="toc-number">1.2.1.</span> <span class="toc-text">启动codis-dashboard</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动codis-fe"><span class="toc-number">1.2.2.</span> <span class="toc-text">启动codis-fe</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动codis-proxy"><span class="toc-number">1.2.3.</span> <span class="toc-text">启动codis-proxy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动codis-server"><span class="toc-number">1.2.4.</span> <span class="toc-text">启动codis-server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过fe添加group"><span class="toc-number">1.2.5.</span> <span class="toc-text">通过fe添加group</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#通过fe初始化slot"><span class="toc-number">1.2.6.</span> <span class="toc-text">通过fe初始化slot</span></a></li></ol></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"codis安装及配置　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/12/29/redis集群安装/" title="上一篇: redis集群安装">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/08/23/Go性能分析工具/" title="下一篇: Go性能分析工具">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

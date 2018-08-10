@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="转载翻译，原文地址：Stack Traces In Go Go里面的堆栈跟踪在Go语言中有一些调试技巧能帮助我们快速找到问题，有时候你想尽可能多的记录异常但仍觉得不够，搞清楚堆栈的意义有助于定位Bug或者记录更完整的信息。 本文将讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。 Functions (函数的情况)先从这段代码开始： 清单112345678910package mainfunc">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go里面的堆栈跟踪">
+<meta property="og:url" content="http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="转载翻译，原文地址：Stack Traces In Go Go里面的堆栈跟踪在Go语言中有一些调试技巧能帮助我们快速找到问题，有时候你想尽可能多的记录异常但仍觉得不够，搞清楚堆栈的意义有助于定位Bug或者记录更完整的信息。 本文将讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。 Functions (函数的情况)先从这段代码开始： 清单112345678910package mainfunc">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure2.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure1.png">
+<meta property="og:updated_time" content="2018-08-10T03:02:59.826Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go里面的堆栈跟踪">
+<meta name="twitter:description" content="转载翻译，原文地址：Stack Traces In Go Go里面的堆栈跟踪在Go语言中有一些调试技巧能帮助我们快速找到问题，有时候你想尽可能多的记录异常但仍觉得不够，搞清楚堆栈的意义有助于定位Bug或者记录更完整的信息。 本文将讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。 Functions (函数的情况)先从这段代码开始： 清单112345678910package mainfunc">
+<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Go里面的堆栈跟踪 | Hexo</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Go里面的堆栈跟踪" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/07/18/Go里面的堆栈跟踪/" class="article-date">
+      <time datetime="2018-07-18T05:54:48.000Z" itemprop="datePublished">2018-07-18</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Go里面的堆栈跟踪
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Golang/">Golang</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>转载翻译，原文地址：<a href="https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html" target="_blank" rel="noopener">Stack Traces In Go</a></p>
+<h1 id="Go里面的堆栈跟踪"><a href="#Go里面的堆栈跟踪" class="headerlink" title="Go里面的堆栈跟踪"></a>Go里面的堆栈跟踪</h1><p>在Go语言中有一些调试技巧能帮助我们快速找到问题，有时候你想尽可能多的记录异常但仍觉得不够，搞清楚堆栈的意义有助于定位Bug或者记录更完整的信息。</p>
+<p>本文将讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。</p>
+<h2 id="Functions-函数的情况"><a href="#Functions-函数的情况" class="headerlink" title="Functions (函数的情况)"></a>Functions (函数的情况)</h2><p>先从这段代码开始：</p>
+<h3 id="清单1"><a href="#清单1" class="headerlink" title="清单1"></a>清单1</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">   slice := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line">   Example(slice, <span class="string">"hello"</span>, <span class="number">10</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Example</span><span class="params">(slice []<span class="keyword">string</span>, str <span class="keyword">string</span>, i <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">   <span class="built_in">panic</span>(<span class="string">"Want stack trace"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>清单1</strong>显示了一个程序，其中main函数在第05行调用Example函数.Example函数在第08行声明并接受三个参数，1个string类型的slice, 1个string和1个integer, 。 Example执行的唯一代码是调用第09行的内置函数panic，它会立即生成堆栈跟踪：</p>
+<h3 id="清单2"><a href="#清单2" class="headerlink" title="清单2"></a>清单2</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Panic: Want stack trace</span><br><span class="line"></span><br><span class="line">goroutine 1 [running]:</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br><span class="line">        /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">        temp/main.go:9 +0x64</span><br><span class="line">main.main()</span><br><span class="line">        /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">        temp/main.go:5 +0x85</span><br><span class="line"></span><br><span class="line">goroutine 2 [runnable]:</span><br><span class="line">runtime.forcegchelper()</span><br><span class="line">        /Users/bill/go/src/runtime/proc.go:90</span><br><span class="line">runtime.goexit()</span><br><span class="line">        /Users/bill/go/src/runtime/asm_amd64.s:2232 +0x1</span><br><span class="line"></span><br><span class="line">goroutine 3 [runnable]:</span><br><span class="line">runtime.bgsweep()</span><br><span class="line">        /Users/bill/go/src/runtime/mgc0.go:82</span><br><span class="line">runtime.goexit()</span><br><span class="line">        /Users/bill/go/src/runtime/asm_amd64.s:2232 +0x1</span><br></pre></td></tr></table></figure>
+<p><strong>清单2</strong>中的堆栈跟踪显示了panic是存在的所有goroutine,每个程序的状态以及相应goroutine下的调用堆栈。</p>
+<p>正在运行的goroutine和导致堆栈跟踪的goroutine将位于顶部。让我们关注报了panic的goroutine.</p>
+<h3 id="清单3"><a href="#清单3" class="headerlink" title="清单3"></a>清单3</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">01 goroutine 1 [running]:</span><br><span class="line">02 main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br><span class="line">           /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">           temp/main.go:9 +0x64</span><br><span class="line">03 main.main()</span><br><span class="line">           /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">           temp/main.go:5 +0x85</span><br></pre></td></tr></table></figure>
+<p>清单三中地 01 行的的堆栈跟踪显示goroutine 1 在panic之前运行，在第 02 行，我们看到panic的代码在package main中的Example函数中。缩进的行显示了次函数所在的代码文件和路径以及正在执行的代码行。在这种情况下，第 09 行的代码正在运行，这是对panic的调用。</p>
+<p>第 03 行显示调用Example的函数的名称，这是main包中的主要功能，在函数名称下面，缩进的行显示了对Example进行调用的代码文件的路径和代码行</p>
+<p>堆栈工资显示goroutine范围内的函数调用链，直到发生panic发生，现在让我们关注传递给Example函数的每个参数的值：</p>
+<h3 id="清单4"><a href="#清单4" class="headerlink" title="清单4"></a>清单4</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Call to Example by main.</span><br><span class="line">slice := make([]string, 2, 4)</span><br><span class="line">Example(slice, &quot;hello&quot;, 10)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
+<p><strong>清单4</strong> 这里展示了在main中带参数调用Example函数时的堆栈信息 。 将堆栈跟踪中的值与函数声明进行比较时，它似乎不匹配。 Example函数的声明接受三个参数，但堆栈跟踪显示六个十六进制值。 要理解值如何与参数匹配的关键需要知道每个参数类型的实现。</p>
+<p>让我们从第一个参数开始，它是一个1个string类型的slice， slice是Go中的引用类型。 这意味着slice的值是一个标题值，其中包含指向某些基础数据的指针。 在slice的情况下，标头值是三字结构，其包含指向底层阵列的指针，slice的长度和容量。 与切片标头关联的值由堆栈跟踪中的前三个值表示：</p>
+<h3 id="清单5"><a href="#清单5" class="headerlink" title="清单5"></a>清单5</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// Slice parameter value</span><br><span class="line">slice := make([]string, 2, 4)</span><br><span class="line"></span><br><span class="line">// Slice header values</span><br><span class="line">Pointer:  0x2080c3f50</span><br><span class="line">Length:   0x2</span><br><span class="line">Capacity: 0x4</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
+<p><strong>清单5</strong> 显示了堆栈跟踪中的前三个值如何与slice参数匹配。 第一个值表示指向底层字符串数组的指针。 用于初始化slice的长度和容量的数字与第二个和第三个值匹配 。这三个值表示切片标头的每个值，即Example函数的第一个参数。</p>
+<p><strong>Figure 1</strong></p>
+<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png" alt=""></p>
+<p>现在让我们看一下第二个参数，它是一个string。 string也是引用类型，但此标头值是不可变的。 字符串的标头值被声明为两部分，包含指向底层字节数组的指针和字符串的长度：</p>
+<h3 id="清单6"><a href="#清单6" class="headerlink" title="清单6"></a>清单6</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// String parameter value</span><br><span class="line">&quot;hello&quot;</span><br><span class="line"></span><br><span class="line">// String header values</span><br><span class="line">Pointer: 0x425c0</span><br><span class="line">Length:  0x5</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
+<p><strong>清单6</strong>显示了堆栈跟踪中的第四个和第五个值如何与string参数匹配。 第四个值表示指向底层字节数组的指针，第五个值表示字符串的长度为5。字符串</p>
+<p>“hello”</p>
+<p>需要5个字节。 这两个值表示字符串标题的每个值，即Example函数的第二个参数。</p>
+<p><strong>Figure 2</strong></p>
+<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure2.png" alt=""></p>
+<p>第三个参数是一个整数，它是一个单值：</p>
+<h3 id="清单7"><a href="#清单7" class="headerlink" title="清单7"></a>清单7</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// Integer parameter value</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">// Integer value</span><br><span class="line">Base 16: 0xa</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
+<p><strong>清单7</strong>显示了堆栈跟踪中的最后一个值如何与int类型的参数匹配。 trace中的最后一个值是十六进制数0xa，它的值是10.与该参数传递的值相同。 该值代表Example函数中的第三个参数。</p>
+<p><strong>Figure 3</strong></p>
+<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure1.png" alt=""></p>
+<h2 id="Methods-方法的情况"><a href="#Methods-方法的情况" class="headerlink" title="Methods(方法的情况)"></a>Methods(方法的情况)</h2><p>如果我们将Example作为结构体的方法会怎么样呢?</p>
+<h3 id="清单8"><a href="#清单8" class="headerlink" title="清单8"></a>清单8</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">01</span> <span class="keyword">package</span> main</span><br><span class="line"><span class="number">02</span></span><br><span class="line"><span class="number">03</span> <span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="number">04</span></span><br><span class="line"><span class="number">05</span> <span class="keyword">type</span> trace <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"><span class="number">06</span></span><br><span class="line"><span class="number">07</span> <span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"><span class="number">08</span>     slice := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line"><span class="number">09</span></span><br><span class="line"><span class="number">10</span>     <span class="keyword">var</span> t trace</span><br><span class="line"><span class="number">11</span>     t.Example(slice, <span class="string">"hello"</span>, <span class="number">10</span>)</span><br><span class="line"><span class="number">12</span> &#125;</span><br><span class="line"><span class="number">13</span></span><br><span class="line"><span class="number">14</span> <span class="function"><span class="keyword">func</span> <span class="params">(t *trace)</span> <span class="title">Example</span><span class="params">(slice []<span class="keyword">string</span>, str <span class="keyword">string</span>, i <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line"><span class="number">15</span>     fmt.Printf(<span class="string">"Receiver Address: %p\n"</span>, t)</span><br><span class="line"><span class="number">16</span>     <span class="built_in">panic</span>(<span class="string">"Want stack trace"</span>)</span><br><span class="line"><span class="number">17</span> &#125;</span><br></pre></td></tr></table></figure>
+<p><strong>清单8</strong>通过在第05行声明一个名为trace的新类型，并更改程序，将Example申明为trace类型的方法。通过使用trace类型的指针接收器重新声明该函数来完成转换。 然后在第10行，将变量t申明为trace类型，并且在第11行进行方法调用。</p>
+<p>由于该方法是使用指针声明的，因此Go将获取变量t的地址来支持接收者类型，即使方法调用是使用值来完成的。 这次运行程序时，堆栈跟踪有点不同：</p>
+<h3 id="清单9"><a href="#清单9" class="headerlink" title="清单9"></a>清单9</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Receiver Address: 0x1553a8</span><br><span class="line">panic: Want stack trace</span><br><span class="line"></span><br><span class="line">01 goroutine 1 [running]:</span><br><span class="line">02 main.(*trace).Example(0x1553a8, 0x2081b7f50, 0x2, 0x4, 0xdc1d0, 0x5, 0xa)</span><br><span class="line">           /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">           temp/main.go:16 +0x116</span><br><span class="line"></span><br><span class="line">03 main.main()</span><br><span class="line">           /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">           temp/main.go:11 +0xae</span><br></pre></td></tr></table></figure>
+<p>在<strong>清单9</strong>中你应该注意的第一件事是第02行的堆栈跟踪清楚的显示这是一个使用指针接收器调用的方法。现在函数的名称显示的样子是： 在package名字和方法名之间多出了”*trace”字样 。 需要注意的第二件事是参数列表的第1个参数标明了结构体(t)地址。 我们从堆栈跟踪中看到了这个实现细节。</p>
+<h2 id="Packing（打包）"><a href="#Packing（打包）" class="headerlink" title="Packing（打包）"></a>Packing（打包）</h2><p>如果有多个参数可以填充到一个single word, 那么堆栈跟踪中参数的值将打包在一起 ：</p>
+<h3 id="清单10"><a href="#清单10" class="headerlink" title="清单10"></a>清单10</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">01</span> <span class="keyword">package</span> main</span><br><span class="line"><span class="number">02</span></span><br><span class="line"><span class="number">03</span> <span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"><span class="number">04</span>     Example(<span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">true</span>, <span class="number">25</span>)</span><br><span class="line"><span class="number">05</span> &#125;</span><br><span class="line"><span class="number">06</span> </span><br><span class="line"><span class="number">07</span> <span class="function"><span class="keyword">func</span> <span class="title">Example</span><span class="params">(b1, b2, b3 <span class="keyword">bool</span>, i <span class="keyword">uint8</span>)</span></span> &#123;</span><br><span class="line"><span class="number">08</span>     <span class="built_in">panic</span>(<span class="string">"Want stack trace"</span>)</span><br><span class="line"><span class="number">09</span> &#125;</span><br></pre></td></tr></table></figure>
+<p>这个例子修改Example函数改为接收4个参数：3个bool型和1个八位无符号整型。bool值也是用8个bit表示，所以在32位和64位架构下，4个参数可以合并为一个single word。 当程序运行时，它会产生一个有趣的堆栈跟踪 :</p>
+<h3 id="清单11"><a href="#清单11" class="headerlink" title="清单11"></a>清单11</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">01 goroutine 1 [running]:</span><br><span class="line">02 main.Example(0x19010001)</span><br><span class="line">           /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">           temp/main.go:8 +0x64</span><br><span class="line">03 main.main()</span><br><span class="line">           /Users/bill/Spaces/Go/Projects/src/github.com/goinaction/code/</span><br><span class="line">           temp/main.go:4 +0x32</span><br></pre></td></tr></table></figure>
+<p>对于对Example的调用，堆栈跟踪中没有四个值，而是有一个值。所有四个单独的8位值都拼凑成一个单词：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">// Parameter values</span><br><span class="line">true, false, true, 25</span><br><span class="line"></span><br><span class="line">// Word value</span><br><span class="line">Bits    Binary      Hex   Value</span><br><span class="line">00-07   0000 0001   01    true</span><br><span class="line">08-15   0000 0000   00    false</span><br><span class="line">16-23   0000 0001   01    true</span><br><span class="line">24-31   0001 1001   19    25</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(b1, b2, b3 bool, i uint8)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x19010001)</span><br></pre></td></tr></table></figure>
+<p><strong>清单12</strong>显示了堆栈跟踪中的值是如何与传入的所有四个参数值匹配.true的值是一个8位值，用1表示，false的值是0.二进制25的值是11001，转换为十六进制是19。 现在，我们看到堆栈信息中包括十六进制值，需要知道这些值是如何传递的。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>Go运行时提供了大量信息来帮助我们调试程序。在这篇文章中，我们专注于堆栈跟踪。分析在整个调用堆栈中传递给每个函数的值的能力是很有用的。它不止一次帮助我很快识别我的错误。既然您已经知道如何读取堆栈跟踪，那么希望您可以在下次发生堆栈跟踪时利用这些知识。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
+        <p><span>发布时间:</span>2018-07-18, 13:54:48</p>
+        <p><span>最后更新:</span>2018-08-10, 11:02:59</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/07/18/Go里面的堆栈跟踪/" title="Go里面的堆栈跟踪">http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/07/13/Consul安装部署/">
+                    Consul安装部署
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Go里面的堆栈跟踪"><span class="toc-number">1.</span> <span class="toc-text">Go里面的堆栈跟踪</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Functions-函数的情况"><span class="toc-number">1.1.</span> <span class="toc-text">Functions (函数的情况)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#清单1"><span class="toc-number">1.1.1.</span> <span class="toc-text">清单1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单2"><span class="toc-number">1.1.2.</span> <span class="toc-text">清单2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单3"><span class="toc-number">1.1.3.</span> <span class="toc-text">清单3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单4"><span class="toc-number">1.1.4.</span> <span class="toc-text">清单4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单5"><span class="toc-number">1.1.5.</span> <span class="toc-text">清单5</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单6"><span class="toc-number">1.1.6.</span> <span class="toc-text">清单6</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单7"><span class="toc-number">1.1.7.</span> <span class="toc-text">清单7</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Methods-方法的情况"><span class="toc-number">1.2.</span> <span class="toc-text">Methods(方法的情况)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#清单8"><span class="toc-number">1.2.1.</span> <span class="toc-text">清单8</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单9"><span class="toc-number">1.2.2.</span> <span class="toc-text">清单9</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Packing（打包）"><span class="toc-number">1.3.</span> <span class="toc-text">Packing（打包）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#清单10"><span class="toc-number">1.3.1.</span> <span class="toc-text">清单10</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#清单11"><span class="toc-number">1.3.2.</span> <span class="toc-text">清单11</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#结论"><span class="toc-number">2.</span> <span class="toc-text">结论</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Go里面的堆栈跟踪　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/07/13/Consul安装部署/" title="下一篇: Consul安装部署">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

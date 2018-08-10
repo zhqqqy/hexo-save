@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="Go性能分析工具 | zhqqqy          var yiliaConfig = {         fancybox: true,         animate: true,         isHome:">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://zhqqqy.github.io/Go性能分析工具/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Go性能分析工具 | zhqqqy          var yiliaConfig = {         fancybox: true,         animate: true,         isHome:">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/img/avatar.png">
+<meta property="og:image" content="http://zhqqqy.github.io/img/avatar.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/debug_pprof.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/client_pprof.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/analyze.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/Blog/hexo/source/_posts/Go性能分析工具/sum&cum&flat.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/fire1.png">
+<meta property="og:updated_time" content="2018-08-09T08:02:51.391Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="Go性能分析工具 | zhqqqy          var yiliaConfig = {         fancybox: true,         animate: true,         isHome:">
+<meta name="twitter:image" content="http://zhqqqy.github.io/img/avatar.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Hexo</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: false,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/Go性能分析工具/index.html" class="article-date">
+      <time datetime="2018-08-10T01:21:40.650Z" itemprop="datePublished">2018-08-10</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <style>
+    .article-meta { display: none; }
+    #container .article .article-title { padding-right: 0; }
+    .article-header {
+        padding: 0;
+        padding-top: 26px;
+        border-left: none;
+        text-align: center;
+    }
+    .article-header:hover { border-left: none; }
+    .article-title { font-size: 1.6em }
+    .article-entry hr { margin: 0;}
+    .article-meta,
+    #container .article-info-post.article-info { display: none;}
+    #container .article .article-title { padding: 0; }
+</style>
+
+
+          
+        <!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="四娃">
+
+
+
+<meta name="description" content="为什么需要性能分析作为开发，一般在开发过程大多是为了功能的实现和单元测试，当业务量不大的时候，也不会说去过早的分析代码的性能。但是一旦业务量上来，原有开发中代码写的不太好的地方会造成性能瓶颈，这个时候就得需要性能分析工具帮助分析程序在哪块代码上出现了性能瓶颈。才可以有针对性的优化代码。 很幸运的，go语言官方有提供的性能工具pprof，我们可以很方便的分析程序运行过程中造成瓶颈的地方 pprof什">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go性能分析工具">
+<meta property="og:url" content="http://yoursite.com/2017/08/23/Go性能分析工具/index.html">
+<meta property="og:site_name" content="zhqqqy">
+<meta property="og:description" content="为什么需要性能分析作为开发，一般在开发过程大多是为了功能的实现和单元测试，当业务量不大的时候，也不会说去过早的分析代码的性能。但是一旦业务量上来，原有开发中代码写的不太好的地方会造成性能瓶颈，这个时候就得需要性能分析工具帮助分析程序在哪块代码上出现了性能瓶颈。才可以有针对性的优化代码。 很幸运的，go语言官方有提供的性能工具pprof，我们可以很方便的分析程序运行过程中造成瓶颈的地方 pprof什">
+<meta property="og:image" content="http://yoursite.com/2017/08/23/Go性能分析工具/debug_pprof.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/23/Go性能分析工具/client_pprof.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/23/Go性能分析工具/analyze.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/23/Go性能分析工具/Blog/hexo/source/_posts/Go性能分析工具/sum&cum&flat.png">
+<meta property="og:image" content="http://yoursite.com/2017/08/23/Go性能分析工具/fire1.png">
+<meta property="og:updated_time" content="2018-07-20T05:05:45.634Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go性能分析工具">
+<meta name="twitter:description" content="为什么需要性能分析作为开发，一般在开发过程大多是为了功能的实现和单元测试，当业务量不大的时候，也不会说去过早的分析代码的性能。但是一旦业务量上来，原有开发中代码写的不太好的地方会造成性能瓶颈，这个时候就得需要性能分析工具帮助分析程序在哪块代码上出现了性能瓶颈。才可以有针对性的优化代码。 很幸运的，go语言官方有提供的性能工具pprof，我们可以很方便的分析程序运行过程中造成瓶颈的地方 pprof什">
+<meta name="twitter:image" content="http://yoursite.com/2017/08/23/Go性能分析工具/debug_pprof.png">
+
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/img/avatar.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Go性能分析工具 | zhqqqy</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: undefined
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">四娃</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                            <li><a href="/sitemap.xml">sitemap</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email" target="_blank" rel="noopener"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub" target="_blank" rel="noopener"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/" target="_blank" rel="noopener">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/" target="_blank" rel="noopener">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">四娃</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">四娃</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                    <li><a href="/sitemap.xml">sitemap</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我">
+</nav>
+      <div class="body-wrap"><article id="post-Go性能分析工具" class="article article-type-post" itemscope="" itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/08/23/Go性能分析工具/" class="article-date">
+      <time datetime="2017-08-23T09:33:44.000Z" itemprop="datePublished">2017-08-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Go性能分析工具
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Golang/">Golang</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="为什么需要性能分析"><a href="#为什么需要性能分析" class="headerlink" title="为什么需要性能分析"></a>为什么需要性能分析</h1><p>作为开发，一般在开发过程大多是为了功能的实现和单元测试，当业务量不大的时候，也不会说去过早的分析代码的性能。但是一旦业务量上来，原有开发中代码写的不太好的地方会造成性能瓶颈，这个时候就得需要性能分析工具帮助分析程序在哪块代码上出现了性能瓶颈。才可以有针对性的优化代码。</p>
+<p>很幸运的，go语言官方有提供的性能工具pprof，我们可以很方便的分析程序运行过程中造成瓶颈的地方</p>
+<h1 id="pprof"><a href="#pprof" class="headerlink" title="pprof"></a>pprof</h1><h2 id="什么是pprof"><a href="#什么是pprof" class="headerlink" title="什么是pprof"></a>什么是pprof</h2><p>pprof是Go语言内置的标准方法用来调试Go程序性能。golang官方有提供两种pprof启动的方式，分别是 <a href="https://golang.org/pkg/runtime/pprof/" target="_blank" rel="external">runtime/pprof</a>，<a href="https://golang.org/pkg/net/http/pprof/" target="_blank" rel="external">net/http/pprof</a>  ，它能提取出来应用程序的CPU和内存数据，此外还有运行的代码行数和内容信息。 </p>
+<h2 id="pprof文件生成"><a href="#pprof文件生成" class="headerlink" title="pprof文件生成"></a>pprof文件生成</h2><h3 id="runtime-pprof"><a href="#runtime-pprof" class="headerlink" title="runtime/pprof"></a>runtime/pprof</h3><p>此包是方便不是提供web服务的后端程序来进行分析性能</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</div><div class="line">	f, err := os.Create(fmt.Sprintf(<span class="string">"cpu-%s.pprof"</span>, time.Now().Format(<span class="string">"20060102"</span>)))</div><div class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</div><div class="line">		log.Fatal(<span class="string">"create CPU profile error: "</span>, err)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">if</span> err := pprof.StartCPUProfile(f); err != <span class="literal">nil</span> &#123;</div><div class="line">		log.Fatal(<span class="string">"start CPU profile error: "</span>, err)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">defer</span> pprof.StopCPUProfile()</div><div class="line"></div><div class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</div><div class="line">		doSth()</div><div class="line">	&#125;()</div><div class="line">	<span class="comment">//优雅退出</span></div><div class="line">	sigChan := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal)</div><div class="line">	exitChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</div><div class="line">	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)</div><div class="line">	log.Printf(<span class="string">"signal received"</span>, &lt;-sigChan)</div><div class="line"></div><div class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</div><div class="line">		<span class="keyword">if</span> err := server.Stop(); err != <span class="literal">nil</span> &#123;</div><div class="line">			log.Fatal(err)</div><div class="line">		&#125;</div><div class="line">		exitChan &lt;- <span class="keyword">struct</span>&#123;&#125;&#123;&#125;</div><div class="line">	&#125;()</div><div class="line">	<span class="keyword">select</span> &#123;</div><div class="line">	<span class="keyword">case</span> &lt;-exitChan:</div><div class="line">	<span class="keyword">case</span> s := &lt;-sigChan:</div><div class="line">		log.Panicln(<span class="string">"signal received, stopping immediately"</span>, s)</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">doSth</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="keyword">for</span> &#123;</div><div class="line">		rand.Float32()</div><div class="line">		time.Sleep(<span class="number">500</span> * time.Millisecond)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此时运行程序会生成关于cpu统计的文件cpu-20170823.pprof</p>
+<p>然后通过命令执行</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">~ <span class="keyword">go</span> tool pprof .\cpu<span class="number">-20170823.</span>pprof</div><div class="line">Type: cpu</div><div class="line">Time: Jul <span class="number">19</span>, <span class="number">2018</span> at <span class="number">5</span>:<span class="number">31</span>pm (CST)</div><div class="line">Duration: <span class="number">58.32s</span>, Total samples = <span class="number">0</span></div><div class="line">Entering interactive mode (<span class="keyword">type</span> <span class="string">"help"</span> <span class="keyword">for</span> commands, <span class="string">"o"</span> <span class="keyword">for</span> options)</div><div class="line">(pprof)</div></pre></td></tr></table></figure>
+<p>然后就可以在pprof下使用命令了</p>
+<p>可以通过go tool pprof命令查看pprof支持哪些命令。</p>
+<p><a href="https://golang.org/pkg/runtime/pprof/" target="_blank" rel="external">runtime/pprof</a>的缺点是必须将程序关闭或者设置信号量来停止pprof的输出，这样才可以使用生产的pprof文件</p>
+<h3 id="net-http-pprof"><a href="#net-http-pprof" class="headerlink" title="net/http/pprof"></a>net/http/pprof</h3><p>对专门提供web服务的程序可以使用此包，可以方便的测试应用程序的性能</p>
+<p>要使用<code>net/http/pprof</code>包很简单，在main.go文件导入包的时候，通过<code>_ &quot;net/http/pprof&quot;</code>方式导入，其实看pprof.go的文件就能知道，实现的原理。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</div><div class="line">	http.HandleFunc(<span class="string">"/debug/pprof/"</span>, Index)</div><div class="line">	http.HandleFunc(<span class="string">"/debug/pprof/cmdline"</span>, Cmdline)</div><div class="line">	http.HandleFunc(<span class="string">"/debug/pprof/profile"</span>, Profile)</div><div class="line">	http.HandleFunc(<span class="string">"/debug/pprof/symbol"</span>, Symbol)</div><div class="line">	http.HandleFunc(<span class="string">"/debug/pprof/trace"</span>, Trace)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="通过浏览器分析"><a href="#通过浏览器分析" class="headerlink" title="通过浏览器分析"></a>通过浏览器分析</h4><p>pprof.go中最开始先申明一个init函数，这里申明了五个<code>HandleFunc</code>对应的可以在浏览器中可以打开着五个页面</p>
+<p><code>/debug/pprof/</code>页面是首页，可以查看go程序的堆栈、goroutine、线程等信息</p>
+<p><img src="/2017/08/23/Go性能分析工具/debug_pprof.png" alt=""></p>
+<p>一般如果要获取cpu的信息，生成pprof文件，则直接访问<code>/debug/pprof/profile</code>，</p>
+<p>通过代码:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">Profile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</div><div class="line">sec, _ := strconv.ParseInt(r.FormValue(<span class="string">"seconds"</span>), <span class="number">10</span>, <span class="number">64</span>)</div><div class="line">	<span class="keyword">if</span> sec == <span class="number">0</span> &#123;</div><div class="line">		sec = <span class="number">30</span></div><div class="line">	&#125;</div><div class="line">········</div><div class="line">	<span class="keyword">if</span> err := pprof.StartCPUProfile(w); err != <span class="literal">nil</span> &#123;</div><div class="line">		<span class="comment">// StartCPUProfile failed, so no writes yet.</span></div><div class="line">		<span class="comment">// Can change header back to text content</span></div><div class="line">		<span class="comment">// and send error code.</span></div><div class="line">		w.Header().Set(<span class="string">"Content-Type"</span>, <span class="string">"text/plain; charset=utf-8"</span>)</div><div class="line">		w.Header().Set(<span class="string">"X-Go-Pprof"</span>, <span class="string">"1"</span>)</div><div class="line">		w.WriteHeader(http.StatusInternalServerError)</div><div class="line">		fmt.Fprintf(w, <span class="string">"Could not enable CPU profiling: %s\n"</span>, err)</div><div class="line">		<span class="keyword">return</span></div><div class="line">	&#125;</div><div class="line">	sleep(w, time.Duration(sec)*time.Second)</div><div class="line">	pprof.StopCPUProfile()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看出<code>Profile</code>函数接收一个cpu收集时间，是按秒为单位收集的，如果，不填的话，默认是30秒的收集时间.</p>
+<p>所以想自定义程序收集cpu的时间的话就可以自己传入手机时间的数值</p>
+<p>比如我要手机1分钟的数据，则只需要<code>localhost:8080/debug/pprof/profile?seconds=60</code>.这样的话，程序就会进入60秒的cpu收集时间，等到收集完成后，会返回一个profile的二进制文件，我们可以给重命名为<code>cpu.pprof</code>，然后就可以使用go tool pprof cpu.pprof 来进行性能分析了。</p>
+<p>同理内存分析可以通过访问<code>localhost:8080/debug/pprof/heap</code></p>
+<h4 id="通过命令行来分析"><a href="#通过命令行来分析" class="headerlink" title="通过命令行来分析"></a>通过命令行来分析</h4><p>可以通过命令收集cpu</p>
+<p><code>go tool pprof http://localhost:8080/debug/pprof/profile</code></p>
+<p>同样可以进行数据收集，当然，可以后面设置参数(<code>--seconds 25</code>表示设置25秒)，默认是30秒的收集时间。收集完成后悔进入pprof模式下</p>
+<p><img src="/2017/08/23/Go性能分析工具/client_pprof.png" alt=""></p>
+<p>也可以通过命令收集内存<code>go tool pprof http://localhost:8080/debug/pprof/heap</code></p>
+<h2 id="pprof文件分析"><a href="#pprof文件分析" class="headerlink" title="pprof文件分析"></a>pprof文件分析</h2><p>接下来就是重点，如何分析我们pprof文件：</p>
+<p>在进入pprof状态之后，可以使用top命令来查看，最耗费资源的是哪些函数</p>
+<p><img src="/2017/08/23/Go性能分析工具/analyze.png" alt=""></p>
+<p>这里分析下各个参数的意思</p>
+<h3 id="flat和cum"><a href="#flat和cum" class="headerlink" title="flat和cum:"></a>flat和cum:</h3><p>Flat表示给定函数的持续时间，cum表示当前函数的累加调用。 比如有一个函数a()调用函数b()和函数c(),</p>
+<p>函数b()耗时1秒，函数b()耗时两秒，那么cum就是1+2=3s</p>
+<p>flat表示的是a()函数自己耗费的时间</p>
+<p>如果a()函数是这样的</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">b() <span class="comment">// takes 2s</span></div><div class="line">do something directly <span class="comment">// takes 3s</span></div><div class="line">c() <span class="comment">// takes 2s</span></div></pre></td></tr></table></figure>
+<p>那么a函数的cum值是6秒，flat是3秒（假设do something directly里面没有函数调用）</p>
+<h3 id="sum"><a href="#sum" class="headerlink" title="sum:"></a>sum:</h3><p>要理解sum需要看上图，第一个sum是25%和flat的25%是相同的，然后第二个sum是50%,是第一个flat的25%加上第二个flat的25%，以此类推。</p>
+<p>具体可以参考：</p>
+<p><a href="https://www.reddit.com/r/golang/comments/7ony5f/what_is_the_meaning_of_flat_and_cum_in_golang/" target="_blank" rel="external">What is the meaning of “flat” and “cum” in golang pprof output</a></p>
+<h3 id="图形分析"><a href="#图形分析" class="headerlink" title="图形分析"></a>图形分析</h3><p>只是通过top命令来查看分析数据的话，太过抽象也不好分析，go tool pprof中也有工具可以把生成的pprof文件转换成图形工具，但是需要事先安装 graphviz 。</p>
+<p>安装好之后可以直接使用命令来生成图片</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root@iZbp14ouog5ocoeakj39q1Z guess]# go tool pprof  cpu.pprof</div><div class="line">Entering interactive mode (type "help" for commands)</div><div class="line">(pprof) svg</div><div class="line">Generating report in profile001.svg</div><div class="line">(pprof)</div></pre></td></tr></table></figure>
+<p>这样就生成了svg图片<code>profile001.svg</code></p>
+<p><img src="/2017/08/23/Go性能分析工具/Blog\hexo\source\_posts\Go性能分析工具\sum&amp;cum&amp;flat.png" alt=""></p>
+<p>由于我代码中并没有写太多的业务逻辑，所以这里可以看到大部分的耗时多事发生在运行时，四个耗时25%的函数是<code>runtime.memmove</code> <code>runtime.memeqbody</code> <code>runtimecgocall</code> <code>runtime.stdcall</code>.接下来，可以根据图形具体分析程序在哪里耗费资源然后进行优化</p>
+<h2 id="火焰图"><a href="#火焰图" class="headerlink" title="火焰图"></a>火焰图</h2><p>上图的结构给我们的是晦涩难懂的感觉，我们需要寻求更直观，更简单的分析工具。而且使用火焰图不需要安装graphviz </p>
+<p>go-torch是<code>Uber</code>公司开源的一款针对Go语言程序的火焰图生成工具，能收集 stack traces,并把它们整理成火焰图，直观地程序给开发人员。</p>
+<p>go-torch是基于使用BrendanGregg创建的火焰图工具生成直观的图像，很方便地分析Go的各个方法所占用的CPU的时间， 火焰图是一个新的方法来可视化CPU的使用情况，本文中我会展示如何使用它辅助我们排查问题。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>1.首先，我们要配置<code>FlameGraph</code>的脚本</p>
+<blockquote>
+<p>FlameGraph 是profile数据的可视化层工具，已被广泛用于Python和Node</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/brendangregg/FlameGraph.git</div></pre></td></tr></table></figure>
+<p>2.检出完成后，把<code>flamegraph.pl</code>拷到我们机器环境变量$PATH的路径中去，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp flamegraph.pl /usr/local/bin</div></pre></td></tr></table></figure>
+<p>3.在终端输入 <code>flamegraph.pl -h</code> 是否安装FlameGraph成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">$ flamegraph.pl -h</div><div class="line">Option h is ambiguous (hash, height, help)</div><div class="line">USAGE: /usr/local/bin/flamegraph.pl [options] infile &gt; outfile.svg</div><div class="line"></div><div class="line">    --title       # change title text</div><div class="line">    --width       # width of image (default 1200)</div><div class="line">    --height      # height of each frame (default 16)</div><div class="line">    --minwidth    # omit smaller functions (default 0.1 pixels)</div><div class="line">    --fonttype    # font type (default &quot;Verdana&quot;)</div><div class="line">    --fontsize    # font size (default 12)</div><div class="line">    --countname   # count type label (default &quot;samples&quot;)</div><div class="line">    --nametype    # name type label (default &quot;Function:&quot;)</div><div class="line">    --colors      # set color palette. choices are: hot (default), mem, io,</div><div class="line">                  # wakeup, chain, java, js, perl, red, green, blue, aqua,</div><div class="line">                  # yellow, purple, orange</div><div class="line">    --hash        # colors are keyed by function name hash</div><div class="line">    --cp          # use consistent palette (palette.map)</div><div class="line">    --reverse     # generate stack-reversed flame graph</div><div class="line">    --inverted    # icicle graph</div><div class="line">    --negate      # switch differential hues (blue&lt;-&gt;red)</div><div class="line">    --help        # this message</div><div class="line"></div><div class="line">    eg,</div><div class="line">    /usr/local/bin/flamegraph.pl --title=&quot;Flame Graph: malloc()&quot; trace.txt &gt; graph.svg</div></pre></td></tr></table></figure>
+<p>4.安装go-torch</p>
+<p>有了flamegraph的支持，我们接下来要使用go-torch展示profile的输出，而安装go-torch很简单，我们使用下面的命令即可完成安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">go get -v github.com/uber/go-torch</div></pre></td></tr></table></figure>
+<p>5.使用go-torch -h命令：可以查看go-torch的帮助文档，这里我们根据生产的cpu.pprof文件，通过使用go-torch 命令来生成火焰图</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$ go-torch -b cpu.pprof -f cpu.svg</div><div class="line">INFO[12:38:16] Run pprof command: go tool pprof -raw cpu.pprof</div><div class="line">INFO[12:38:16] Writing svg to cpu.svg</div></pre></td></tr></table></figure>
+<ul>
+<li><strong>-b：</strong>表示需要被转换成svg的二进制文件</li>
+<li><strong>-f：</strong>表示要生成的svg图片名称</li>
+</ul>
+<p>此时已经将cpu.pprof生成了cpu.svg的火焰图了，可以通过浏览器查看</p>
+<p><img src="/2017/08/23/Go性能分析工具/fire1.png" alt=""></p>
+<p>这就是go-torch生成的火焰图，看起来是不是舒服多了。</p>
+<blockquote>
+<ul>
+<li>火焰图的y轴表示cpu调用方法的先后，比如：<code>bufio.(*Writer).Flush</code>是由<code>net/http.(*chunkWriter).write</code>和<code>net/http.CheckConnErrorWriter.Writer</code>两个函数组成的。</li>
+<li>x轴表示在每个采样调用时间内，方法所占的时间百分比，越宽代表占据cpu时间越多</li>
+</ul>
+</blockquote>
+<p>有了火焰图，我们就可以更清楚的看到哪个方法调用耗时长了，然后不断的修正代码，重新采样，不断优化。</p>
+<h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><p><a href="http://lihaoquan.me/2017/1/1/Profiling-and-Optimizing-Go-using-go-torch.html" target="_blank" rel="external">Go代码调优利器-火焰图</a></p>
+<p><a href="https://blog.csdn.net/WaltonWang/article/details/54019891" target="_blank" rel="external">Golang性能调优(go-torch, go tool pprof)</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">四娃</a></p>
+        <p><span>发布时间:</span>2017-08-23, 17:33:44</p>
+        <p><span>最后更新:</span>2018-07-20, 13:05:45</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/08/23/Go性能分析工具/" title="Go性能分析工具">http://yoursite.com/2017/08/23/Go性能分析工具/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2017/08/23/Go性能分析工具/　　作者: 四娃" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target="_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2017/12/12/codis/">
+                    codis安装及配置
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/08/16/golang-http包/">
+                    golang-http包
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#为什么需要性能分析"><span class="toc-number">1.</span> <span class="toc-text">为什么需要性能分析</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pprof"><span class="toc-number">2.</span> <span class="toc-text">pprof</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是pprof"><span class="toc-number">2.1.</span> <span class="toc-text">什么是pprof</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pprof文件生成"><span class="toc-number">2.2.</span> <span class="toc-text">pprof文件生成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#runtime-pprof"><span class="toc-number">2.2.1.</span> <span class="toc-text">runtime/pprof</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#net-http-pprof"><span class="toc-number">2.2.2.</span> <span class="toc-text">net/http/pprof</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#通过浏览器分析"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">通过浏览器分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#通过命令行来分析"><span class="toc-number">2.2.2.2.</span> <span class="toc-text">通过命令行来分析</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pprof文件分析"><span class="toc-number">2.3.</span> <span class="toc-text">pprof文件分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#flat和cum"><span class="toc-number">2.3.1.</span> <span class="toc-text">flat和cum:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sum"><span class="toc-number">2.3.2.</span> <span class="toc-text">sum:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#图形分析"><span class="toc-number">2.3.3.</span> <span class="toc-text">图形分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#火焰图"><span class="toc-number">2.4.</span> <span class="toc-text">火焰图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-number">2.4.1.</span> <span class="toc-text">安装</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考："><span class="toc-number">3.</span> <span class="toc-text">参考：</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录" title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Go性能分析工具　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/12/12/codis/" title="上一篇: codis安装及配置">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/08/16/golang-http包/" title="下一篇: golang-http包">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis Cluster 集群安装/">redis Cluster 集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/my-first-blog/">6.4 defer 和追踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/hello-world/">First Test</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 四娃
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style="display:none">
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style="display:none">
+                        <span id="page-visit" title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
+      
+    </div>
+    
+  </div>
+  
+    
+
+
+  
+</article>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

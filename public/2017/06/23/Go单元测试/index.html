@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="为什么需要单元测试 开发程序其中很重要的一点是测试，我们如何保证代码的质量，如何保证每个函数是可运行，运行结果是正确的，又如何保证写出来的代码性能是好的，我们知道单元测试的重点在于发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决。对一个包做（单元）测试，需要写一些可以频繁（每次更新后）执行的小块测试单元来检查代码的正确性。于是我们必须写一些 Go 源文件来测试代码。测试程序必须属于">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go单元测试">
+<meta property="og:url" content="http://zhqqqy.github.io/2017/06/23/Go单元测试/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="为什么需要单元测试 开发程序其中很重要的一点是测试，我们如何保证代码的质量，如何保证每个函数是可运行，运行结果是正确的，又如何保证写出来的代码性能是好的，我们知道单元测试的重点在于发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决。对一个包做（单元）测试，需要写一些可以频繁（每次更新后）执行的小块测试单元来检查代码的正确性。于是我们必须写一些 Go 源文件来测试代码。测试程序必须属于">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go单元测试/更新.png">
+<meta property="og:updated_time" content="2018-08-10T02:54:16.975Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go单元测试">
+<meta name="twitter:description" content="为什么需要单元测试 开发程序其中很重要的一点是测试，我们如何保证代码的质量，如何保证每个函数是可运行，运行结果是正确的，又如何保证写出来的代码性能是好的，我们知道单元测试的重点在于发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决。对一个包做（单元）测试，需要写一些可以频繁（每次更新后）执行的小块测试单元来检查代码的正确性。于是我们必须写一些 Go 源文件来测试代码。测试程序必须属于">
+<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Go单元测试 | Hexo</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Go单元测试" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/06/23/Go单元测试/" class="article-date">
+      <time datetime="2017-06-23T09:33:44.000Z" itemprop="datePublished">2017-06-23</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Go单元测试
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Golang/">Golang</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="为什么需要单元测试"><a href="#为什么需要单元测试" class="headerlink" title="为什么需要单元测试"></a>为什么需要单元测试</h1><p> 开发程序其中很重要的一点是测试，我们如何保证代码的质量，如何保证每个函数是可运行，运行结果是正确的，又如何保证写出来的代码性能是好的，我们知道单元测试的重点在于发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决。对一个包做（单元）测试，需要写一些可以频繁（每次更新后）执行的小块测试单元来检查代码的正确性。于是我们必须写一些 Go 源文件来测试代码。测<strong>试程序必须属于被测试的包</strong>，并且文件名满足这种形式 <code>*_test.go</code>，所以测试代码和包中的业务代码是分开的。</p>
+<p> Go语言中自带有一个轻量级的测试框架<code>testing</code>和自带的<code>go test</code>命令来实现单元测试和性能测试，<code>testing</code>框架和其他语言中的测试框架类似，你可以基于这个框架写针对相应函数的测试用例。</p>
+<p><code>_test</code> 程序不会被普通的 Go 编译器编译，所以当放应用部署到生产环境时它们不会被部署；只有 gotest 会编译所有的程序：普通程序和测试程序。</p>
+<p>另外建议安装<a href="https://github.com/cweill/gotests" target="_blank" rel="noopener">gotests</a>插件自动生成测试代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get -u -v github.com/cweill/gotests/...</span><br></pre></td></tr></table></figure>
+<p>go单元测试的命令是</p>
+<p><code>go test</code></p>
+<p>go test 只会输出错误的信息，想要看详细的信息使用<code>go test -v</code></p>
+<h1 id="Go的自带单元测试的编写"><a href="#Go的自带单元测试的编写" class="headerlink" title="Go的自带单元测试的编写"></a>Go的自带单元测试的编写</h1><h2 id="1、如何编写测试用例"><a href="#1、如何编写测试用例" class="headerlink" title="1、如何编写测试用例"></a>1、如何编写测试用例</h2><p>接下来我们在该目录下面创建两个文件：even.go和oddeven_test.go<br><strong>even.go:</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">用来测试前 100 个整数是否是偶数。这个函数属于 even 包。</span><br><span class="line">*/</span><br><span class="line">package even</span><br><span class="line">func Even(i int) bool &#123;</span><br><span class="line">	return i%2 == 0</span><br><span class="line">&#125;</span><br><span class="line">func Odd(i int) bool &#123;</span><br><span class="line">	return i%2 != 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>oddeven_test.go:这是我们的单元测试文件，</strong></p>
+<h3 id="1-1测试文件的规则："><a href="#1-1测试文件的规则：" class="headerlink" title="1.1测试文件的规则："></a><strong>1.1测试文件的规则：</strong></h3><ol>
+<li>文件名必须是<code>_test.go</code>结尾的，这样在执行<code>go test</code>的时候才会执行到相应的代码</li>
+<li>你必须import <code>testing</code>这个包</li>
+<li>所有的测试用例函数必须是<code>Test</code>开头</li>
+<li>测试用例会按照源代码中写的顺序依次执行</li>
+<li>测试函数<code>TestXxx()</code>的参数是<code>testing.T</code>，我们可以使用该类型来记录错误或者是测试状态</li>
+<li>测试格式：<code>func TestXxx (t *testing.T)</code>,<code>Xxx</code>部分可以为任意的字母数字的组合，但是首字母不能是小写字母[a-z]，例如<code>Testintdiv</code>是错误的函数名。</li>
+<li>函数中通过调用<code>testing.T</code>的<code>Error</code>, <code>Errorf</code>, <code>FailNow</code>, <code>Fatal</code>, <code>FatalIf</code>方法，说明测试不通过，调用<code>Log</code>方法用来记录测试的信息。</li>
+</ol>
+<p><strong>oddeven_test.go</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> even</span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestEven</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> !Even(<span class="number">10</span>) &#123; <span class="comment">//!Even(10)==false,不会向下执行</span></span><br><span class="line">		t.Log(<span class="string">"10 must be even"</span>)</span><br><span class="line">		t.Fail()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> Even(<span class="number">7</span>) &#123;</span><br><span class="line">		t.Log(<span class="string">"7 is not even"</span>)</span><br><span class="line">		t.Fatal()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> Even(<span class="number">10</span>) &#123; <span class="comment">//Even(10)==true,但是为了测试，让它执行t.Log()和 t.Fail()</span></span><br><span class="line">		t.Log(<span class="string">"Everything OK: 10 is even, just a test to see failed output!"</span>)</span><br><span class="line">		t.Fail()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestOdd</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> !Odd(<span class="number">11</span>) &#123;</span><br><span class="line">		t.Log(<span class="string">" 11 must be odd!"</span>)</span><br><span class="line">		t.Fail()</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> Odd(<span class="number">10</span>) &#123;</span><br><span class="line">		t.Log(<span class="string">" 10 is not odd!"</span>)</span><br><span class="line">		t.Fail()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>使用go test 运行oddeven_test.go,只会出现错误信息</strong></p>
+<blockquote>
+<p>— FAIL: TestEven (0.00s)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; oddeven_test.go:16: Everything OK: 10 is even, just a test to see failed output!</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>FAIL<br>exit status 1<br>FAIL MyStudy/GolangTest/even 0.364s</p>
+</blockquote>
+<p><strong>使用go test -v，会将详细的信息都打印出来，通过的会有pass标识</strong></p>
+<blockquote>
+<p>=== RUN TestEven<br>— FAIL: TestEven (0.00s)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; oddeven_test.go:16: Everything OK: 10 is even, just a test to see failed output!</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>=== RUN TestOdd<br>— PASS: TestOdd (0.00s)<br>FAIL<br>exit status 1<br>FAIL MyStudy/GolangTest/even 0.397s</p>
+</blockquote>
+<h3 id="1-2单元测试的一些通知失败的方法"><a href="#1-2单元测试的一些通知失败的方法" class="headerlink" title="1.2单元测试的一些通知失败的方法"></a>1.2单元测试的一些通知失败的方法</h3><p>1）<code>func (t *T) Fail()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">标记测试函数为失败，然后继续执行（剩下的测试）。</span><br></pre></td></tr></table></figure>
+<p>2）<code>func (t *T) FailNow()</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">标记测试函数为失败并中止执行；文件中别的测试也被略过，继续执行下一个文件。</span><br></pre></td></tr></table></figure>
+<p>3）<code>func (t *T) Log(args ...interface{})</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">args 被用默认的格式格式化并打印到错误日志中。</span><br></pre></td></tr></table></figure>
+<p>4）<code>func (t *T) Fatal(args ...interface{})</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">结合 先执行 3），然后执行 2）的效果。</span><br></pre></td></tr></table></figure>
+<h1 id="GoGonvey框架写单元测试"><a href="#GoGonvey框架写单元测试" class="headerlink" title="GoGonvey框架写单元测试"></a>GoGonvey框架写单元测试</h1><h2 id="1、GoGonvey框架介绍"><a href="#1、GoGonvey框架介绍" class="headerlink" title="1、GoGonvey框架介绍"></a>1、GoGonvey框架介绍</h2><p> Go 语言虽然自带单元测试功能，在 GoConvey 诞生之前也出现了许多第三方辅助库。但没有一个辅助库能够像 GoConvey 这样优雅地书写代码的单元测试，简洁的语法和舒适的界面能够让一个不爱书写单元测试的开发人员从此爱上单元测试。</p>
+<h3 id="1-1、GoGonvey的优点"><a href="#1-1、GoGonvey的优点" class="headerlink" title="1.1、GoGonvey的优点"></a>1.1、GoGonvey的优点</h3><ol>
+<li>GoConvey支持Go的本机<a href="http://golang.org/pkg/testing/" target="_blank" rel="noopener"><code>testing</code></a>包。无论是网页界面还是DSL都不需要; 你可以独立使用任何一个。</li>
+<li>GoConvey集成后<code>**go test**</code>，您可以<a href="https://github.com/smartystreets/goconvey/wiki/Execution" target="_blank" rel="noopener">在终端中</a>继续运行测试<a href="https://github.com/smartystreets/goconvey/wiki/Execution" target="_blank" rel="noopener">，</a>或者使用自动更新Web UI进行测试。</li>
+<li>GoConvey还有web UI可以来方便查看代码覆盖率，以及单元测试错误信息</li>
+</ol>
+<h3 id="1-2、安装GoGonvey"><a href="#1-2、安装GoGonvey" class="headerlink" title="1.2、安装GoGonvey"></a>1.2、安装GoGonvey</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get github.com/smartystreets/goconvey</span><br></pre></td></tr></table></figure>
+<h3 id="1-3、快速开始一个例子"><a href="#1-3、快速开始一个例子" class="headerlink" title="1.3、快速开始一个例子"></a>1.3、快速开始一个例子</h3><p>写一个oddeven_goconvey_test.go 文件,将test.go改写成convey形式的</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> even</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	. <span class="string">"github.com/smartystreets/goconvey/convey"</span></span><br><span class="line">	<span class="string">"testing"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestEvenConvey</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	Convey(<span class="string">"Given some integer with a starting value"</span>, t, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		Convey(<span class="string">"When the integer is even"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; <span class="comment">//第一个Convey需要t参数，以后的不需要了</span></span><br><span class="line">			Convey(<span class="string">"10 must be even"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">				b := Even(<span class="number">10</span>)</span><br><span class="line">				So(b, ShouldBeTrue)</span><br><span class="line">			&#125;)</span><br><span class="line"></span><br><span class="line">			Convey(<span class="string">"7 is not even"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">				b := Even(<span class="number">7</span>)</span><br><span class="line">				So(b, ShouldBeFalse)</span><br><span class="line">			&#125;)</span><br><span class="line"></span><br><span class="line">			Convey(<span class="string">"Everything OK: 10 is even, just a test to see failed output!"</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">				b := Even(<span class="number">10</span>)</span><br><span class="line">				So(b, ShouldBeFalse)</span><br><span class="line">			&#125;)</span><br><span class="line"></span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 使用 GoConvey 书写单元测试，每个测试用例需要使用Convey函数包裹起来。它接受的第一个参数为 string 类型的描述；第二个参数一般为*testing.T，即本例中的变量 t；第三个参数为不接收任何参数也不返回任何值的函数（习惯以闭包的形式书写）。</p>
+<p>Convey语句同样可以无限嵌套，以体现各个测试用例之间的关系，例如TestEvenConvey函数就采用了嵌套的方式体现它们之间的关系。需要注意的是，<strong>只有最外层的Convey需要传入变量 t，内层的嵌套均不需要传入</strong>。</p>
+<p>最后，需要使用So语句来对条件进行判断。在本例中，我们只使用了 2 个不同类型的条件判断：ShouldBeTrue和ShouldBeFalse，分别表示值应该为 true、值应该false。</p>
+<p>常用的有</p>
+<ol>
+<li><code>ShouldEqual</code>: 表示值应该想等</li>
+<li><code>ShouldResemble</code>: 进行深度相同检查，要有两个值<code>So(b, ShouldResemble, true)</code></li>
+<li><code>ShouldBeTrue</code>: 表示值应该为true</li>
+<li><code>ShouldBeZeroValue</code>:表示值应该为0</li>
+<li><code>ShouldNotContainSubstring</code>:接收2字符串参数并确保第一个不包含第二个字符串。</li>
+<li><code>ShouldPanic</code>: 表示值应该panic</li>
+</ol>
+<p>有关详细的条件列表，可以参见<a href="https://github.com/smartystreets/goconvey/wiki/Assertions" target="_blank" rel="noopener">官方文档</a>。</p>
+<h3 id="1-4、运行测试"><a href="#1-4、运行测试" class="headerlink" title="1.4、运行测试"></a>1.4、运行测试</h3><h4 id="1-4-1、go-test-v运行"><a href="#1-4-1、go-test-v运行" class="headerlink" title="1.4.1、go test -v运行"></a>1.4.1、go test -v运行</h4><p>现在，可以打开命令行，然后输入<code>go test -v</code>来进行测试。由于 GoConvey 兼容 Go 原生的单元测试，因此我们可以直接使用 Go 的命令来执行测试。 </p>
+<blockquote>
+<p>=== RUN TestEvenConvey</p>
+<p>Given some integer with a starting value<br>When the integer is even<br>10 must be even .<br>7 is not even .<br>Everything OK: 10 is even, just a test to see failed output! x</p>
+<p>Failures: </p>
+<p>D:/gopath/src/MyStudy/GolangTest/even/oddeven_goconvey_test.go</p>
+<p>Line 23:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; Expected: false</span><br><span class="line">&gt; Actual:   true</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p> 3 total assertions</p>
+<p>— FAIL: TestEvenConvey (0.00s)<br>FAIL<br>exit status 1<br>FAIL MyStudy/GolangTest/even 0.401s</p>
+</blockquote>
+<p>可以看到给出的信息比go自带的测试包多很多信息</p>
+<h4 id="1-4-2、goconvey-运行测试"><a href="#1-4-2、goconvey-运行测试" class="headerlink" title="1.4.2、goconvey 运行测试"></a>1.4.2、goconvey 运行测试</h4><p>web界面查看数据</p>
+<p>GoConvey 不仅支持在命令行进行人工调用调试命令，还有非常舒适的 Web 界面提供给开发者来进行自动化的编译测试工作。在项目目录下执行<code>goconvey</code> 同时可以打开浏览器查看localhost:8080</p>
+<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png" alt=""></p>
+<p>解析上面图片</p>
+<h3 id="1-5、GoConvey的一些功能"><a href="#1-5、GoConvey的一些功能" class="headerlink" title="1.5、GoConvey的一些功能"></a>1.5、GoConvey的一些功能</h3><h4 id="测试自动运行"><a href="#测试自动运行" class="headerlink" title="测试自动运行"></a>测试自动运行</h4><p> 只需保存<code>.go</code><img src="/home/zhaohq/blog/hexo/source/_posts/Go单元测试/更新.png" alt="文件或单击图标执行测试">。您的浏览器页面将自动更新。</p>
+<h4 id="覆盖报告"><a href="#覆盖报告" class="headerlink" title="覆盖报告"></a>覆盖报告</h4><p>可以点击左上角的软件包名称来查看<a href="http://blog.golang.org/cover#TOC_5." target="_blank" rel="noopener">Go的详细HTML覆盖率报告</a>。</p>
+<h4 id="黑暗，光和自定义主题"><a href="#黑暗，光和自定义主题" class="headerlink" title="黑暗，光和自定义主题"></a>黑暗，光和自定义主题</h4><p>GoConvey内置了两个主题。（在此页面上<a href="javascript:" target="_blank" rel="noopener">切换主题</a>以尝试！）您还可以使用第三方主题或自己滚动。</p>
+<h4 id="暂停，恢复和审查"><a href="#暂停，恢复和审查" class="headerlink" title="暂停，恢复和审查"></a>暂停，恢复和审查</h4><p>可以暂停自动测试执行，并查看最近的测试历史，以查看代码在何处，何时以及为什么中断。</p>
+<p>在 Web 界面中，您可以设置界面主题，查看完整的测试结果，使用浏览器提醒等实用功能。</p>
+<h4 id="其它功能："><a href="#其它功能：" class="headerlink" title="其它功能："></a>其它功能：</h4><ol>
+<li>自动检测代码变动并编译测试</li>
+<li>半自动化书写测试用例：<a href="http://localhost:8080/composer.html" target="_blank" rel="noopener">http://localhost:8080/composer.html</a></li>
+<li>查看测试覆盖率：<a href="http://localhost:8080/reports/" target="_blank" rel="noopener">http://localhost:8080/reports/</a></li>
+<li>临时屏蔽某个包的编译测试</li>
+</ol>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/06/23/Go单元测试/">Go单元测试</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
+        <p><span>发布时间:</span>2017-06-23, 17:33:44</p>
+        <p><span>最后更新:</span>2018-08-10, 10:54:16</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/06/23/Go单元测试/" title="Go单元测试">http://zhqqqy.github.io/2017/06/23/Go单元测试/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2017/06/23/Go单元测试/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2017/08/16/golang-http包/">
+                    golang-http包
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2017/06/15/defer和追踪/">
+                    defer和追踪
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#为什么需要单元测试"><span class="toc-number">1.</span> <span class="toc-text">为什么需要单元测试</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Go的自带单元测试的编写"><span class="toc-number">2.</span> <span class="toc-text">Go的自带单元测试的编写</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1、如何编写测试用例"><span class="toc-number">2.1.</span> <span class="toc-text">1、如何编写测试用例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1测试文件的规则："><span class="toc-number">2.1.1.</span> <span class="toc-text">1.1测试文件的规则：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2单元测试的一些通知失败的方法"><span class="toc-number">2.1.2.</span> <span class="toc-text">1.2单元测试的一些通知失败的方法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GoGonvey框架写单元测试"><span class="toc-number">3.</span> <span class="toc-text">GoGonvey框架写单元测试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1、GoGonvey框架介绍"><span class="toc-number">3.1.</span> <span class="toc-text">1、GoGonvey框架介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1、GoGonvey的优点"><span class="toc-number">3.1.1.</span> <span class="toc-text">1.1、GoGonvey的优点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2、安装GoGonvey"><span class="toc-number">3.1.2.</span> <span class="toc-text">1.2、安装GoGonvey</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3、快速开始一个例子"><span class="toc-number">3.1.3.</span> <span class="toc-text">1.3、快速开始一个例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4、运行测试"><span class="toc-number">3.1.4.</span> <span class="toc-text">1.4、运行测试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-1、go-test-v运行"><span class="toc-number">3.1.4.1.</span> <span class="toc-text">1.4.1、go test -v运行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-2、goconvey-运行测试"><span class="toc-number">3.1.4.2.</span> <span class="toc-text">1.4.2、goconvey 运行测试</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5、GoConvey的一些功能"><span class="toc-number">3.1.5.</span> <span class="toc-text">1.5、GoConvey的一些功能</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#测试自动运行"><span class="toc-number">3.1.5.1.</span> <span class="toc-text">测试自动运行</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#覆盖报告"><span class="toc-number">3.1.5.2.</span> <span class="toc-text">覆盖报告</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#黑暗，光和自定义主题"><span class="toc-number">3.1.5.3.</span> <span class="toc-text">黑暗，光和自定义主题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#暂停，恢复和审查"><span class="toc-number">3.1.5.4.</span> <span class="toc-text">暂停，恢复和审查</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#其它功能："><span class="toc-number">3.1.5.5.</span> <span class="toc-text">其它功能：</span></a></li></ol></li></ol></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Go单元测试　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2017/08/16/golang-http包/" title="上一篇: golang-http包">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2017/06/15/defer和追踪/" title="下一篇: defer和追踪">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

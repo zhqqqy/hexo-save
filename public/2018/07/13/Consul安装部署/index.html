@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="什么是Consul 是一个服务管理软件。 支持多数据中心下，分布式高可用的，服务发现和配置共享。 consul支持健康检查，允许存储键值对。 一致性协议采用 Raft 算法,用来保证服务的高可用. 成员管理和消息广播 采用GOSSIP协议，支持ACL访问控制。  ACL技术 在路由器中被广泛采用，它是一种基于包过滤的流控制技术。控制列表通过把源地址、目的地址及端口号作为数据包检查的基本元素，并可以">
+<meta name="keywords" content="Consul">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Consul安装部署">
+<meta property="og:url" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是Consul 是一个服务管理软件。 支持多数据中心下，分布式高可用的，服务发现和配置共享。 consul支持健康检查，允许存储键值对。 一致性协议采用 Raft 算法,用来保证服务的高可用. 成员管理和消息广播 采用GOSSIP协议，支持ACL访问控制。  ACL技术 在路由器中被广泛采用，它是一种基于包过滤的流控制技术。控制列表通过把源地址、目的地址及端口号作为数据包检查的基本元素，并可以">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+<meta property="og:updated_time" content="2018-08-10T01:38:36.677Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Consul安装部署">
+<meta name="twitter:description" content="什么是Consul 是一个服务管理软件。 支持多数据中心下，分布式高可用的，服务发现和配置共享。 consul支持健康检查，允许存储键值对。 一致性协议采用 Raft 算法,用来保证服务的高可用. 成员管理和消息广播 采用GOSSIP协议，支持ACL访问控制。  ACL技术 在路由器中被广泛采用，它是一种基于包过滤的流控制技术。控制列表通过把源地址、目的地址及端口号作为数据包检查的基本元素，并可以">
+<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>Consul安装部署 | Hexo</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-Consul安装部署" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/07/13/Consul安装部署/" class="article-date">
+      <time datetime="2018-07-13T07:45:07.000Z" itemprop="datePublished">2018-07-13</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Consul安装部署
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/分布式/">分布式</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Consul/">Consul</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="什么是Consul"><a href="#什么是Consul" class="headerlink" title="什么是Consul"></a>什么是Consul</h1><ul>
+<li>是一个服务管理软件。</li>
+<li>支持多数据中心下，分布式高可用的，服务发现和配置共享。</li>
+<li>consul支持健康检查，允许存储键值对。</li>
+<li>一致性协议采用 Raft 算法,用来保证服务的高可用.</li>
+<li>成员管理和消息广播 采用GOSSIP协议，支持ACL访问控制。</li>
+</ul>
+<p><strong>ACL技术</strong></p>
+<p>在路由器中被广泛采用，它是一种基于包过滤的流控制技术。控制列表通过把源地址、目的地址及端口号作为数据包检查的基本元素，并可以规定符合条件的数据包是否允许通过。</p>
+<p><strong>gossip就是p2p协议。</strong></p>
+<p>他主要要做的事情是，去中心化。<br>这个协议就是模拟人类中传播谣言的行为而来。首先要传播谣言就要有种子节点。种子节点每秒都会随机向其他节点发送自己所拥有的节点列表，以及需要传播的消息。任何新加入的节点，就在这种传播方式下很快地被全网所知道。</p>
+<p><strong>什么是强一致性协议？</strong></p>
+<p>按照某一顺序串行执行存储对象读写操作， 更新存储对象之后， 后续访问总是读到最新值。 假如进程A先更新了存储对象，存储系统保证后续A,B,C进程的读取操作都将返回最新值。强一致性模型有几种常见实现方法， 主从同步复制， 以及quorum复制等。</p>
+<p>Consul is opinionated in its usage while Serf is a more flexible and general purpose tool. In CAP terms, Consul uses a CP architecture, favoring consistency over availability.</p>
+<p><a href="https://www.consul.io/intro/vs/serf.html" target="_blank" rel="noopener">官方文档地址</a></p>
+<p>说明consul是cp的，并不是网上有些文章说的是ca模式</p>
+<p>下面表格对consul 、zookeeper、 etcd、 euerka做了对比</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Consul</th>
+<th>zookeeper</th>
+<th>etcd</th>
+<th>euerka</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务健康检查</td>
+<td>服务状态，内存，硬盘等</td>
+<td>(弱)长连接，keepalive</td>
+<td>连接心跳</td>
+<td>可配支持</td>
+</tr>
+<tr>
+<td>多数据中心</td>
+<td>支持</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>kv存储服务</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+<td>—</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td>raft</td>
+<td>paxos</td>
+<td>raft</td>
+<td>—</td>
+</tr>
+<tr>
+<td>cap</td>
+<td>cp</td>
+<td>cp</td>
+<td>cp</td>
+<td>ap</td>
+</tr>
+<tr>
+<td>使用接口(多语言能力)</td>
+<td>支持http和dns</td>
+<td>客户端</td>
+<td>http/grpc</td>
+<td>http（sidecar）</td>
+</tr>
+<tr>
+<td>watch支持</td>
+<td>全量/支持long polling</td>
+<td>支持</td>
+<td>支持 long polling</td>
+<td>支持 long polling/大部分增量</td>
+</tr>
+<tr>
+<td>自身监控</td>
+<td>metrics</td>
+<td>—</td>
+<td>metrics</td>
+<td>metrics</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>acl /https</td>
+<td>acl</td>
+<td>https支持（弱）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>spring cloud集成</td>
+<td>已支持</td>
+<td>已支持</td>
+<td>已支持</td>
+<td>已支持</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Consul安装"><a href="#Consul安装" class="headerlink" title="Consul安装"></a>Consul安装</h1><p>安装Consul,找到适合你系统的包下载他.Consul打包为一个’Zip’文件.<a href="https://www.consul.io/downloads.html" target="_blank" rel="noopener">前往下载</a></p>
+<p>下载后解开压缩包.拷贝Consul到你的PATH路径中,在Unix系统中<code>/bin</code>和<code>/usr/local/bin</code>是通常的安装目录.根据你是想为单个用户安装还是给整个系统安装来选择.在Windows系统中有可以安装到<code>%PATH%</code>的路径中.</p>
+<h2 id="验证安装"><a href="#验证安装" class="headerlink" title="验证安装"></a>验证安装</h2><p>完成安装后,通过打开一个新终端窗口检查<code>consul</code>安装是否成功.通过执行 <code>consul</code>你应该看到类似下面的输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[root@iZbp14ouog5ocoeakj39q1Z ~]# consul</span><br><span class="line">Usage: consul [--version] [--help] &lt;command&gt; [&lt;args&gt;]</span><br><span class="line"></span><br><span class="line">Available commands are:</span><br><span class="line">    agent          Runs a Consul agent</span><br><span class="line">    catalog        Interact with the catalog</span><br><span class="line">    connect        Interact with Consul Connect</span><br><span class="line">    event          Fire a new event</span><br><span class="line">    exec           Executes a command on Consul nodes</span><br><span class="line">    force-leave    Forces a member of the cluster to enter the &quot;left&quot; state</span><br><span class="line">    info           Provides debugging information for operators.</span><br><span class="line">    intention      Interact with Connect service intentions</span><br><span class="line">    join           Tell Consul agent to join cluster</span><br><span class="line">    keygen         Generates a new encryption key</span><br><span class="line">    keyring        Manages gossip layer encryption keys</span><br><span class="line">    kv             Interact with the key-value store</span><br><span class="line">    leave          Gracefully leaves the Consul cluster and shuts down</span><br><span class="line">    lock           Execute a command holding a lock</span><br><span class="line">    maint          Controls node or service maintenance mode</span><br><span class="line">    members        Lists the members of a Consul cluster</span><br><span class="line">    monitor        Stream logs from a Consul agent</span><br><span class="line">    operator       Provides cluster-level tools for Consul operators</span><br><span class="line">    reload         Triggers the agent to reload configuration files</span><br><span class="line">    rtt            Estimates network round trip time between nodes</span><br><span class="line">    snapshot       Saves, restores and inspects snapshots of Consul server state</span><br><span class="line">    validate       Validate config files/directories</span><br><span class="line">    version        Prints the Consul version</span><br><span class="line">    watch          Watch for changes in Consul</span><br></pre></td></tr></table></figure>
+<p>如果你得到一个<code>consul not be found</code>的错误,你的<code>PATH</code>可能没有正确设置.请返回检查你的<code>consul</code>的安装路径是否包含在<code>PATH</code>中.</p>
+<h2 id="consule参数的介绍"><a href="#consule参数的介绍" class="headerlink" title="consule参数的介绍"></a>consule参数的介绍</h2><h3 id="consul-术语"><a href="#consul-术语" class="headerlink" title="consul 术语"></a>consul 术语</h3><p>首先介绍下在 consul 中会经常见到的术语：</p>
+<ul>
+<li><code>node</code>：节点，需要 consul 注册发现或配置管理的服务器。在一个集群中必须是唯一的，默认是该节点的主机名</li>
+<li><code>agent</code>：consul 中的核心程序，它将以守护进程的方式在各个节点运行，有 client 和 server 启动模式。每个 agent 维护一套服务和注册发现以及健康信息。</li>
+<li><code>client</code>：agent 以 client 模式启动的节点。在该模式下，该节点会采集相关信息，通过 RPC 的方式向 server 发送。这个地址提供HTTP、DNS、RPC等服务，默认是127.0.0.1所以不对外提供服务，如果你要对外提供服务改成0.0.0.0</li>
+<li><code>server</code>：agent 以 server 模式启动的节点。一个数据中心中至少包含 1 个 server 节点。不过官方建议使用 3 或 5 个 server 节点组建成集群，以保证高可用且不失效率。server 节点参与 Raft、维护会员信息、注册服务、健康检查等功能。</li>
+<li><code>datacenter</code>：数据中心，私有的，低延迟的和高带宽的网络环境。一般的多个数据中心之间的数据是不会被复制的，但可用过 <a href="https://www.consul.io/docs/guides/acl.html#outages-and-acl-replication" target="_blank" rel="noopener">ACL replication</a> 或使用外部工具 <a href="https://github.com/hashicorp/consul-replicate" target="_blank" rel="noopener">onsul-replicate</a>。</li>
+<li><code>Consensus</code>，<a href="https://www.consul.io/docs/internals/consensus.html" target="_blank" rel="noopener">共识协议</a>，使用它来协商选出 leader。</li>
+<li><code>Gossip</code>：consul 是建立在 <a href="https://www.serf.io/" target="_blank" rel="noopener">Serf</a>，它提供完整的 <a href="https://www.consul.io/docs/internals/gossip.html" target="_blank" rel="noopener">gossip protocol</a>，<a href="https://en.wikipedia.org/wiki/Gossip_protocol" target="_blank" rel="noopener">维基百科</a>。</li>
+<li><code>LAN Gossip</code>，Lan gossip 池，包含位于同一局域网或数据中心上的节点。</li>
+<li><code>WAN Gossip</code>，只包含 server 的 WAN Gossip 池，这些服务器主要位于不同的数据中心，通常通过互联网或广域网进行通信。</li>
+<li><code>members</code>：成员，对 consul 成员的称呼。提供会员资格，故障检测和事件广播。</li>
+<li><code>-bootstrap-expect</code> ：在一个datacenter中期望提供的server节点数目，当该值提供的时候，consul一直等到达到指定sever数目的时候才会引导整个集群，该标记不能和bootstrap共用</li>
+<li><code>-bind</code>：该地址用来在集群内部的通讯，集群内的所有节点到地址都必须是可达的，默认是0.0.0.0</li>
+<li><code>-ui-dir</code>： 提供存放web ui资源的路径，该目录必须是可读的，<strong>1.2中是直接使用-ui参数就可以</strong></li>
+<li><code>-rejoin</code>：使consul忽略先前的离开，在再次启动后仍旧尝试加入集群中。</li>
+<li><code>-config-dir</code>：：配置文件目录，里面所有以.json结尾的文件都会被加载</li>
+</ul>
+<h3 id="consul-端口说明"><a href="#consul-端口说明" class="headerlink" title="consul 端口说明"></a>consul 端口说明</h3><p>consul 内使用了很多端口，理解这些端口的用处对你理解 consul 架构很有帮助：</p>
+<table>
+<thead>
+<tr>
+<th>端口</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TCP/8300</td>
+<td>8300 端口用于服务器节点。客户端通过该端口 RPC 协议调用服务端节点。服务器节点之间相互调用</td>
+</tr>
+<tr>
+<td>TCP/UDP/8301</td>
+<td>8301 端口用于单个数据中心所有节点之间的互相通信，即对 LAN 池信息的同步。它使得整个数据中心能够自动发现服务器地址，分布式检测节点故障，事件广播（如领导选举事件）。</td>
+</tr>
+<tr>
+<td>TCP/UDP/8302</td>
+<td>8302 端口用于单个或多个数据中心之间的服务器节点的信息同步，即对 WAN 池信息的同步。它针对互联网的高延迟进行了优化，能够实现跨数据中心请求。</td>
+</tr>
+<tr>
+<td>8500</td>
+<td>8500 端口基于 HTTP 协议，用于 API 接口或 WEB UI 访问。</td>
+</tr>
+<tr>
+<td>8600</td>
+<td>8600 端口作为 DNS 服务器，它使得我们可以通过节点名查询节点信息。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Consul运行"><a href="#Consul运行" class="headerlink" title="Consul运行"></a>Consul运行</h1><h2 id="开发模式运行consul"><a href="#开发模式运行consul" class="headerlink" title="开发模式运行consul"></a>开发模式运行consul</h2><p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png" alt="img"></a></p>
+<ul>
+<li>查看集群成员</li>
+</ul>
+<p>新开一个终端窗口运行<code>consul members</code>, 你可以看到Consul集群的成员.</p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png" alt="img"></a></p>
+<ul>
+<li><p>浏览器查看webUI界面</p>
+<p>浏览器中输出serverip:8500,会出现consul的管理webUI</p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png" alt="img"></a></p>
+</li>
+</ul>
+<h2 id="生产环境运行consul"><a href="#生产环境运行consul" class="headerlink" title="生产环境运行consul"></a>生产环境运行consul</h2><h3 id="启动三台server服务器"><a href="#启动三台server服务器" class="headerlink" title="启动三台server服务器"></a>启动三台server服务器</h3><p> agent可以运行为server或client模式.每个数据中心至少必须拥有一台server . 建议在一个集群中有3或者5个server.部署单一的server,在出现失败时会不可避免的造成数据丢失.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">其他的agent运行为client模式.一个client是一个非常轻量级的进程.用于注册服务,运行健康检查和转发对server的查询.agent必须在集群中的每个主机上运行.</span><br></pre></td></tr></table></figure>
+<p>这里启动三个agent server，三台机器的地址分别是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">10.174.96.52    s1 </span><br><span class="line">10.173.224.146  s2</span><br><span class="line">10.173.224.74   s3</span><br></pre></td></tr></table></figure>
+<p>必须有一个初始节点，且手动指定为leader，然后开启其它server节点，让它们加入集群。 最后初始节点下线，重新加入集群，参与选举。</p>
+<p>我们手动指定10.174.96.52为leader,这种方式，<code>-bootstrap-expect 3</code> 期待三个 server 加入才能完成 consul 的引导。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">consul agent -server -bootstrap-expect 3 -data-dir /tmp/consul -node=s1 -bind=10.174.96.52 -ui -client 0.0.0.0</span><br></pre></td></tr></table></figure>
+<p>继续添加 server2、server3：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">consul agent -server  -data-dir /tmp/consul -node=s2 -bind=10.173.224.146 -ui -join 10.174.96.52</span><br><span class="line"></span><br><span class="line">consul agent -server  -data-dir /tmp/consul -node=s3 -bind=10.173.224.74 -ui  -join 10.174.96.52</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-data-dir</code>：提供一个目录用来存放agent的状态，所有的agent允许都需要该目录，该目录必须是稳定的，系统重启后都继续存在</li>
+<li><code>-join</code>：将agent加入到集群</li>
+</ul>
+<p><strong>此时10.174.96.52显示的信息是，当146主机和74主机加入到集群后，s1就被选举为leader</strong></p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png" alt="img"></a></p>
+<p><strong>10.173.224.146加入到集群中后显示的信息</strong>：</p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png" alt="img"></a></p>
+<p><strong>查看webUI</strong></p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png" alt="img"></a></p>
+<p>查看三个server的名称</p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png" alt="img"></a></p>
+<h3 id="将新服务服务注册到consul"><a href="#将新服务服务注册到consul" class="headerlink" title="将新服务服务注册到consul"></a>将新服务服务注册到consul</h3><p>consul 支持两种服务发现的方式：</p>
+<ol>
+<li>通过 HTTP API 方式，这种方式需要额外编程，适用于不安装 consul agent 的情况，<a href="https://www.consul.io/api/catalog.html" target="_blank" rel="noopener">文档地址</a>。</li>
+<li>通过 consul agent 配置的方式，agent 启动的时候会读取一个配置文件目录，通过配置进行服务的发现，<a href="https://www.consul.io/docs/agent/services.html" target="_blank" rel="noopener">文档地址</a>。</li>
+</ol>
+<p>这里介绍第二种方式，通过配置文件来进行服务发现。这里就需要用到我们的 client 服务器啦。</p>
+<p>首先，用 Go 写一个简单的 HTTP 服务器：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleExample</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    w.Write([]<span class="keyword">byte</span>(<span class="string">"hello man"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleHealth</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"health check!"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    http.HandleFunc(<span class="string">"/"</span>, HandleExample)</span><br><span class="line">    http.HandleFunc(<span class="string">"/health"</span>, HandleHealth)</span><br><span class="line"></span><br><span class="line">    fmt.Println(<span class="string">"listen on :9000"</span>)</span><br><span class="line">    http.ListenAndServe(<span class="string">":9000"</span>, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后编辑一个配置文件 <code>/etc/consul.d/web.json</code>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"service"</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"name"</span>: <span class="string">"web"</span>,</span><br><span class="line">        <span class="attr">"tags"</span>: [<span class="string">"primary"</span>],</span><br><span class="line">        <span class="attr">"address"</span>: <span class="string">"10.174.96.52"</span>,</span><br><span class="line">        <span class="attr">"port"</span>: <span class="number">9000</span>,</span><br><span class="line">        <span class="attr">"checks"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"http"</span>: <span class="string">"http://localhost:9000/health"</span>,</span><br><span class="line">            <span class="attr">"interval"</span>: <span class="string">"10s"</span></span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png" alt="img"></a></p>
+<ul>
+<li><code>-config-dir</code>：配置文件目录，里面所有以.json结尾的文件都会被加载</li>
+</ul>
+<h3 id="配置共享"><a href="#配置共享" class="headerlink" title="配置共享"></a>配置共享</h3><p>由与有了 agent client 和 server 模式的提供，配置共享也变得异常的简单。</p>
+<p>在任意节点更新配置数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ consul kv put redis/config 192.168.99.133</span><br><span class="line">Success! Data written to: redis/config</span><br></pre></td></tr></table></figure>
+<p>整个集群均会自动更新，在 s1 节点查看数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ consul kv get redis/config</span><br><span class="line">192.168.99.133</span><br></pre></td></tr></table></figure>
+<h2 id="断开连接"><a href="#断开连接" class="headerlink" title="断开连接"></a>断开连接</h2><p>你可以使用<code>Ctrl-C</code> 优雅的关闭Agent. 中断Agent之后你可以看到他离开了集群并关闭.</p>
+<p>在退出中,Consul提醒其他集群成员,这个节点离开了.如果你强行杀掉进程.集群的其他成员应该能检测到这个节点失效了.当一个成员离开,他的服务和检测也会从目录中移除.当一个成员失效了,他的健康状况被简单的标记为危险,但是不会从目录中移除.Consul会自动尝试对失效的节点进行重连.允许他从某些网络条件下恢复过来.离开的节点则不会再继续联系.</p>
+<p>此外,如果一个agent作为一个服务器,一个优雅的离开是很重要的,可以避免引起潜在的可用性故障影响达成<a href="https://www.consul.io/docs/internals/consensus.html" target="_blank" rel="noopener">一致性协议</a>.</p>
+<p>查看<a href="https://www.consul.io/docs/internals/consensus.html" target="_blank" rel="noopener">这里</a>了解添加和移除server.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>一个consul agent就是一个独立的程序。一个长时间运行的守护进程，运行在concul集群中的每个节点上。</p>
+<p>启动一个consul agent ，只是启动一个孤立的node，如果想知道集群中的其他节点，应该将consul agent加入到集群中去 cluster。</p>
+<p><strong>agent有两种模式：server与client。</strong></p>
+<ul>
+<li>server模式包含了一致性的工作：保证一致性和可用性（在部分失败的情况下），响应RPC，同步数据到其他节点代理。</li>
+<li>client 模式用于与server进行通信，转发RPC到服务的代理agent，它仅保存自身的少量一些状态，是非常轻量化的东西。本身是相对无状态的。</li>
+</ul>
+<p>agent除去设置server/client模式、数据路径之外，还最好设置node的名称和ip。</p>
+<p><strong>一张经典的consul架构图片：</strong></p>
+<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="img"></a></p>
+<ul>
+<li>LAN gossip pool包含了同一局域网内所有节点，包括server与client。这基本上是位于同一个数据中心DC。</li>
+<li>WAN gossip pool一般仅包含server，将跨越多个DC数据中心，通过互联网或广域网进行通信。</li>
+<li>Leader服务器负责所有的RPC请求，查询并相应。所以其他服务器收到client的RPC请求时，会转发到leader服务器。</li>
+</ul>
+<h1 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h1><p><a href="https://deepzz.com/post/the-consul-of-discovery-and-configure-services.html" target="_blank" rel="noopener">consul 支持多数据中心的服务发现与配置共享工具</a></p>
+<p><a href="https://blog.csdn.net/viewcode/article/details/45915179" target="_blank" rel="noopener">consul入门</a></p>
+<p><a href="http://www.liangxiansen.cn/2017/04/06/consul" target="_blank" rel="noopener">Consul使用手册</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/07/13/Consul安装部署/">Consul安装部署</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
+        <p><span>发布时间:</span>2018-07-13, 15:45:07</p>
+        <p><span>最后更新:</span>2018-08-10, 09:38:36</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/07/13/Consul安装部署/" title="Consul安装部署">http://zhqqqy.github.io/2018/07/13/Consul安装部署/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/07/13/Consul安装部署/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2018/07/18/Go里面的堆栈跟踪/">
+                    Go里面的堆栈跟踪
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/07/12/微服务初探/">
+                    微服务初探
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是Consul"><span class="toc-number">1.</span> <span class="toc-text">什么是Consul</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Consul安装"><span class="toc-number">2.</span> <span class="toc-text">Consul安装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#验证安装"><span class="toc-number">2.1.</span> <span class="toc-text">验证安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#consule参数的介绍"><span class="toc-number">2.2.</span> <span class="toc-text">consule参数的介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#consul-术语"><span class="toc-number">2.2.1.</span> <span class="toc-text">consul 术语</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#consul-端口说明"><span class="toc-number">2.2.2.</span> <span class="toc-text">consul 端口说明</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Consul运行"><span class="toc-number">3.</span> <span class="toc-text">Consul运行</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#开发模式运行consul"><span class="toc-number">3.1.</span> <span class="toc-text">开发模式运行consul</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生产环境运行consul"><span class="toc-number">3.2.</span> <span class="toc-text">生产环境运行consul</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#启动三台server服务器"><span class="toc-number">3.2.1.</span> <span class="toc-text">启动三台server服务器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#将新服务服务注册到consul"><span class="toc-number">3.2.2.</span> <span class="toc-text">将新服务服务注册到consul</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置共享"><span class="toc-number">3.2.3.</span> <span class="toc-text">配置共享</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#断开连接"><span class="toc-number">3.3.</span> <span class="toc-text">断开连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">3.4.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考："><span class="toc-number">4.</span> <span class="toc-text">参考：</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"Consul安装部署　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/07/18/Go里面的堆栈跟踪/" title="上一篇: Go里面的堆栈跟踪">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/07/12/微服务初探/" title="下一篇: 微服务初探">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
