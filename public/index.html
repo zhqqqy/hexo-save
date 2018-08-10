@@ -19,17 +19,17 @@
 
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
+<meta property="og:title" content="zhqqqy">
 <meta property="og:url" content="http://zhqqqy.github.io/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="zhqqqy">
 <meta property="og:locale" content="default">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="zhqqqy">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
 
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
 
 
 
@@ -58,7 +58,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Hexo</title>
+<title>zhqqqy</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -108,7 +108,7 @@
 
         
             <form id="search-form">
-            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
             <i class="fa fa-times" onclick="resetSearch()"></i>
             </form>
             <div id="local-search-result"></div>
@@ -315,19 +315,19 @@
 <h3 id="清单5"><a href="#清单5" class="headerlink" title="清单5"></a>清单5</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// Slice parameter value</span><br><span class="line">slice := make([]string, 2, 4)</span><br><span class="line"></span><br><span class="line">// Slice header values</span><br><span class="line">Pointer:  0x2080c3f50</span><br><span class="line">Length:   0x2</span><br><span class="line">Capacity: 0x4</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
 <p><strong>清单5</strong> 显示了堆栈跟踪中的前三个值如何与slice参数匹配。 第一个值表示指向底层字符串数组的指针。 用于初始化slice的长度和容量的数字与第二个和第三个值匹配 。这三个值表示切片标头的每个值，即Example函数的第一个参数。</p>
 <p><strong>Figure 1</strong></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png" alt=""></p>
+<p><img src="/2018/07/18/Go里面的堆栈跟踪/Figure3.png" alt=""></p>
 <p>现在让我们看一下第二个参数，它是一个string。 string也是引用类型，但此标头值是不可变的。 字符串的标头值被声明为两部分，包含指向底层字节数组的指针和字符串的长度：</p>
 <h3 id="清单6"><a href="#清单6" class="headerlink" title="清单6"></a>清单6</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// String parameter value</span><br><span class="line">&quot;hello&quot;</span><br><span class="line"></span><br><span class="line">// String header values</span><br><span class="line">Pointer: 0x425c0</span><br><span class="line">Length:  0x5</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
 <p><strong>清单6</strong>显示了堆栈跟踪中的第四个和第五个值如何与string参数匹配。 第四个值表示指向底层字节数组的指针，第五个值表示字符串的长度为5。字符串</p>
 <p>“hello”</p>
 <p>需要5个字节。 这两个值表示字符串标题的每个值，即Example函数的第二个参数。</p>
 <p><strong>Figure 2</strong></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure2.png" alt=""></p>
+<p><img src="/2018/07/18/Go里面的堆栈跟踪/Figure2.png" alt=""></p>
 <p>第三个参数是一个整数，它是一个单值：</p>
 <h3 id="清单7"><a href="#清单7" class="headerlink" title="清单7"></a>清单7</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// Integer parameter value</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">// Integer value</span><br><span class="line">Base 16: 0xa</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
 <p><strong>清单7</strong>显示了堆栈跟踪中的最后一个值如何与int类型的参数匹配。 trace中的最后一个值是十六进制数0xa，它的值是10.与该参数传递的值相同。 该值代表Example函数中的第三个参数。</p>
 <p><strong>Figure 3</strong></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure1.png" alt=""></p>
+<p><img src="/2018/07/18/Go里面的堆栈跟踪/Figure3.png" alt=""></p>
 <h2 id="Methods-方法的情况"><a href="#Methods-方法的情况" class="headerlink" title="Methods(方法的情况)"></a>Methods(方法的情况)</h2><p>如果我们将Example作为结构体的方法会怎么样呢?</p>
 <h3 id="清单8"><a href="#清单8" class="headerlink" title="清单8"></a>清单8</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">01</span> <span class="keyword">package</span> main</span><br><span class="line"><span class="number">02</span></span><br><span class="line"><span class="number">03</span> <span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="number">04</span></span><br><span class="line"><span class="number">05</span> <span class="keyword">type</span> trace <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"><span class="number">06</span></span><br><span class="line"><span class="number">07</span> <span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"><span class="number">08</span>     slice := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line"><span class="number">09</span></span><br><span class="line"><span class="number">10</span>     <span class="keyword">var</span> t trace</span><br><span class="line"><span class="number">11</span>     t.Example(slice, <span class="string">"hello"</span>, <span class="number">10</span>)</span><br><span class="line"><span class="number">12</span> &#125;</span><br><span class="line"><span class="number">13</span></span><br><span class="line"><span class="number">14</span> <span class="function"><span class="keyword">func</span> <span class="params">(t *trace)</span> <span class="title">Example</span><span class="params">(slice []<span class="keyword">string</span>, str <span class="keyword">string</span>, i <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line"><span class="number">15</span>     fmt.Printf(<span class="string">"Receiver Address: %p\n"</span>, t)</span><br><span class="line"><span class="number">16</span>     <span class="built_in">panic</span>(<span class="string">"Want stack trace"</span>)</span><br><span class="line"><span class="number">17</span> &#125;</span><br></pre></td></tr></table></figure>
 <p><strong>清单8</strong>通过在第05行声明一个名为trace的新类型，并更改程序，将Example申明为trace类型的方法。通过使用trace类型的指针接收器重新声明该函数来完成转换。 然后在第10行，将变量t申明为trace类型，并且在第11行进行方法调用。</p>
@@ -559,16 +559,15 @@
 </tr>
 </tbody>
 </table>
-<h1 id="Consul运行"><a href="#Consul运行" class="headerlink" title="Consul运行"></a>Consul运行</h1><h2 id="开发模式运行consul"><a href="#开发模式运行consul" class="headerlink" title="开发模式运行consul"></a>开发模式运行consul</h2><p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png" alt="img"></a></p>
+<h1 id="Consul运行"><a href="#Consul运行" class="headerlink" title="Consul运行"></a>Consul运行</h1><h2 id="开发模式运行consul"><a href="#开发模式运行consul" class="headerlink" title="开发模式运行consul"></a>开发模式运行consul</h2><p><img src="/2018/07/13/Consul安装部署/consul_dev.png" alt=""></p>
 <ul>
 <li>查看集群成员</li>
 </ul>
 <p>新开一个终端窗口运行<code>consul members</code>, 你可以看到Consul集群的成员.</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png" alt="img"></a></p>
+<p><img src="/2018/07/13/Consul安装部署/member_dev.png" alt=""></p>
 <ul>
 <li><p>浏览器查看webUI界面</p>
-<p>浏览器中输出serverip:8500,会出现consul的管理webUI</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png" alt="img"></a></p>
+<p>浏览器中输出serverip:8500,会出现consul的管理webUI<br><img src="/home/zhaohq/blog/hexo/source/_posts/image/Consul安装部署/ui_dev.png" alt=""></p>
 </li>
 </ul>
 <h2 id="生产环境运行consul"><a href="#生产环境运行consul" class="headerlink" title="生产环境运行consul"></a>生产环境运行consul</h2><h3 id="启动三台server服务器"><a href="#启动三台server服务器" class="headerlink" title="启动三台server服务器"></a>启动三台server服务器</h3><p> agent可以运行为server或client模式.每个数据中心至少必须拥有一台server . 建议在一个集群中有3或者5个server.部署单一的server,在出现失败时会不可避免的造成数据丢失.</p>
@@ -584,14 +583,10 @@
 <li><code>-data-dir</code>：提供一个目录用来存放agent的状态，所有的agent允许都需要该目录，该目录必须是稳定的，系统重启后都继续存在</li>
 <li><code>-join</code>：将agent加入到集群</li>
 </ul>
-<p><strong>此时10.174.96.52显示的信息是，当146主机和74主机加入到集群后，s1就被选举为leader</strong></p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png" alt="img"></a></p>
-<p><strong>10.173.224.146加入到集群中后显示的信息</strong>：</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png" alt="img"></a></p>
-<p><strong>查看webUI</strong></p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png" alt="img"></a></p>
-<p>查看三个server的名称</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png" alt="img"></a></p>
+<p><strong>此时10.174.96.52显示的信息是，当146主机和74主机加入到集群后，s1就被选举为leader</strong><br><img src="/2018/07/13/Consul安装部署/leader_52.png" alt=""></p>
+<p><strong>10.173.224.146加入到集群中后显示的信息</strong>：<br><img src="/2018/07/13/Consul安装部署/candidate_146.png" alt=""></p>
+<p><strong>查看webUI</strong><br><img src="/2018/07/13/Consul安装部署/ui_1.png" alt=""></p>
+<p>查看三个server的名称<br><img src="/2018/07/13/Consul安装部署/ui_2.png" alt=""></p>
 <h3 id="将新服务服务注册到consul"><a href="#将新服务服务注册到consul" class="headerlink" title="将新服务服务注册到consul"></a>将新服务服务注册到consul</h3><p>consul 支持两种服务发现的方式：</p>
 <ol>
 <li>通过 HTTP API 方式，这种方式需要额外编程，适用于不安装 consul agent 的情况，<a href="https://www.consul.io/api/catalog.html" target="_blank" rel="noopener">文档地址</a>。</li>
@@ -602,7 +597,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleExample</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    w.Write([]<span class="keyword">byte</span>(<span class="string">"hello man"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleHealth</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"health check!"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    http.HandleFunc(<span class="string">"/"</span>, HandleExample)</span><br><span class="line">    http.HandleFunc(<span class="string">"/health"</span>, HandleHealth)</span><br><span class="line"></span><br><span class="line">    fmt.Println(<span class="string">"listen on :9000"</span>)</span><br><span class="line">    http.ListenAndServe(<span class="string">":9000"</span>, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后编辑一个配置文件 <code>/etc/consul.d/web.json</code>：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"service"</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"name"</span>: <span class="string">"web"</span>,</span><br><span class="line">        <span class="attr">"tags"</span>: [<span class="string">"primary"</span>],</span><br><span class="line">        <span class="attr">"address"</span>: <span class="string">"10.174.96.52"</span>,</span><br><span class="line">        <span class="attr">"port"</span>: <span class="number">9000</span>,</span><br><span class="line">        <span class="attr">"checks"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"http"</span>: <span class="string">"http://localhost:9000/health"</span>,</span><br><span class="line">            <span class="attr">"interval"</span>: <span class="string">"10s"</span></span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png" alt="img"></a></p>
+<p><img src="/2018/07/13/Consul安装部署/ui_3.png" alt=""></p>
 <ul>
 <li><code>-config-dir</code>：配置文件目录，里面所有以.json结尾的文件都会被加载</li>
 </ul>
@@ -624,7 +619,7 @@
 </ul>
 <p>agent除去设置server/client模式、数据路径之外，还最好设置node的名称和ip。</p>
 <p><strong>一张经典的consul架构图片：</strong></p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="img"></a></p>
+<p><img src="/2018/07/13/Consul安装部署/consul架构图.png" alt=""></p>
 <ul>
 <li>LAN gossip pool包含了同一局域网内所有节点，包括server与client。这基本上是位于同一个数据中心DC。</li>
 <li>WAN gossip pool一般仅包含server，将跨越多个DC数据中心，通过互联网或广域网进行通信。</li>
@@ -757,11 +752,11 @@
 <ol>
 <li>客户端的发现</li>
 </ol>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/微服务初探/客户端服务发现.png" alt=""></p>
+<p><img src="/2018/07/12/微服务初探/客户端服务发现.png" alt=""></p>
 <p>最下面有一个注册中心，当微服务启动之后，都会把自己所暴露的ip和port告诉给注册中心，然后客户端通过查询注册中心所注册的服务来得知微服务提供者的ip和port列表，然后通过本地的一些负载均衡等策略来实现对微服务的无差别访问，如果出现一些调用失败的情况，客户端也有自己的重试的规则。</p>
 <p>dubbo和motan就是这种模式</p>
 <p>服务端的发现</p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/微服务初探/服务端服务发现.png" alt=""></p>
+<p><img src="/2018/07/12/微服务初探/服务端服务发现.png" alt=""></p>
 <p>微服务还是同样的将自己的ip和port注册到注册中心，但是客户端不访问注册中心了，他不需通过注册中心指导微服务的列表，而是通过一个固有的ip去访问一个具有服务发现和负载均衡的服务，再由他将请求转发给后端的具体服务，并且将应答返回给客户端，这个服务在中间起到一个类似代理人的作用，他会从注册中心获取到具体的微服务列表，然后维护到自己的内部，然后当客户端请求一个服务的时候，他会知道客户端应该请求的是这个服务对应的哪些实例在运行，然后通过负载均衡算法去选择一个后端。</p>
 <h2 id="服务编排"><a href="#服务编排" class="headerlink" title="服务编排"></a>服务编排</h2><p>服务编排包括，服务发现，服务更新和服务的扩缩融</p>
 <p>流行的服务编排工具：</p>
@@ -996,8 +991,8 @@
 </blockquote>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./admin/codis-server-admin.sh start</span><br><span class="line">tail -100 /tmp/redis_6379.log</span><br></pre></td></tr></table></figure>
 <p>redis.conf 配置中 pidfile、logfile 默认保存在 <code>/tmp</code> 目录，若启动失败，请检查当前用户是否有该目录的读写权限。</p>
-<h3 id="通过fe添加group"><a href="#通过fe添加group" class="headerlink" title="通过fe添加group"></a>通过fe添加group</h3><p>通过web浏览器访问集群管理页面(fe地址:127.0.0.1:8080) 选择我们刚搭建的集群 codis-demo，在 Proxy 栏可看到我们已经启动的 Proxy， 但是 Group 栏为空，因为我们启动的 codis-server 并未加入到集群 添加 <code>NEW GROUP</code>，<code>NEW GROUP</code> 行输入 1，再点击 <code>NEW GROUP</code> 即可 添加 Codis Server，<code>Add Server</code> 行输入我们刚刚启动的 codis-server 地址，添加到我们刚新建的 Group，然后再点击 <code>Add Server</code> 按钮即可，如下图所示<br><img src="/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/addgroup.jpg" alt=""></p>
-<h3 id="通过fe初始化slot"><a href="#通过fe初始化slot" class="headerlink" title="通过fe初始化slot"></a>通过fe初始化slot</h3><p>新增的集群 slot 状态是 offline，因此我们需要对它进行初始化（将 1024 个 slot 分配到各个 group），而初始化最快的方法可通过 fe 提供的 <code>rebalance all slots</code> 按钮来做，如下图所示，点击此按钮，我们即快速完成了一个集群的搭建。<br><img src="/home/zhaohq/blog/hexo/source/_posts/codis安装及配置/rebalance_slots.jpg" alt=""><br>每次增加组之后就需要重新执行<strong>Rebalance All Slots</strong></p>
+<h3 id="通过fe添加group"><a href="#通过fe添加group" class="headerlink" title="通过fe添加group"></a>通过fe添加group</h3><p>通过web浏览器访问集群管理页面(fe地址:127.0.0.1:8080) 选择我们刚搭建的集群 codis-demo，在 Proxy 栏可看到我们已经启动的 Proxy， 但是 Group 栏为空，因为我们启动的 codis-server 并未加入到集群 添加 <code>NEW GROUP</code>，<code>NEW GROUP</code> 行输入 1，再点击 <code>NEW GROUP</code> 即可 添加 Codis Server，<code>Add Server</code> 行输入我们刚刚启动的 codis-server 地址，添加到我们刚新建的 Group，然后再点击 <code>Add Server</code> 按钮即可，如下图所示<br><img src="/2017/12/12/codis安装及配置/addgroup.jpg" alt=""></p>
+<h3 id="通过fe初始化slot"><a href="#通过fe初始化slot" class="headerlink" title="通过fe初始化slot"></a>通过fe初始化slot</h3><p>新增的集群 slot 状态是 offline，因此我们需要对它进行初始化（将 1024 个 slot 分配到各个 group），而初始化最快的方法可通过 fe 提供的 <code>rebalance all slots</code> 按钮来做，如下图所示，点击此按钮，我们即快速完成了一个集群的搭建。<br><img src="/2017/12/12/codis安装及配置/rebalance_slots.jpg" alt=""><br>每次增加组之后就需要重新执行<strong>Rebalance All Slots</strong></p>
 
       
     </div>
@@ -1077,7 +1072,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/"</span>, Index)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/cmdline"</span>, Cmdline)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/profile"</span>, Profile)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/symbol"</span>, Symbol)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/trace"</span>, Trace)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="通过浏览器分析"><a href="#通过浏览器分析" class="headerlink" title="通过浏览器分析"></a>通过浏览器分析</h4><p>pprof.go中最开始先申明一个init函数，这里申明了五个<code>HandleFunc</code>对应的可以在浏览器中可以打开着五个页面</p>
 <p><code>/debug/pprof/</code>页面是首页，可以查看go程序的堆栈、goroutine、线程等信息</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/debug_pprof.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/debug_pprof.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/debug_pprof.png" alt=""></p>
 <p>一般如果要获取cpu的信息，生成pprof文件，则直接访问<code>/debug/pprof/profile</code>，</p>
 <p>通过代码:</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Profile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">sec, _ := strconv.ParseInt(r.FormValue(<span class="string">"seconds"</span>), <span class="number">10</span>, <span class="number">64</span>)</span><br><span class="line">	<span class="keyword">if</span> sec == <span class="number">0</span> &#123;</span><br><span class="line">		sec = <span class="number">30</span></span><br><span class="line">	&#125;</span><br><span class="line">········</span><br><span class="line">	<span class="keyword">if</span> err := pprof.StartCPUProfile(w); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// StartCPUProfile failed, so no writes yet.</span></span><br><span class="line">		<span class="comment">// Can change header back to text content</span></span><br><span class="line">		<span class="comment">// and send error code.</span></span><br><span class="line">		w.Header().Set(<span class="string">"Content-Type"</span>, <span class="string">"text/plain; charset=utf-8"</span>)</span><br><span class="line">		w.Header().Set(<span class="string">"X-Go-Pprof"</span>, <span class="string">"1"</span>)</span><br><span class="line">		w.WriteHeader(http.StatusInternalServerError)</span><br><span class="line">		fmt.Fprintf(w, <span class="string">"Could not enable CPU profiling: %s\n"</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	sleep(w, time.Duration(sec)*time.Second)</span><br><span class="line">	pprof.StopCPUProfile()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1088,11 +1083,11 @@
 <h4 id="通过命令行来分析"><a href="#通过命令行来分析" class="headerlink" title="通过命令行来分析"></a>通过命令行来分析</h4><p>可以通过命令收集cpu</p>
 <p><code>go tool pprof http://localhost:8080/debug/pprof/profile</code></p>
 <p>同样可以进行数据收集，当然，可以后面设置参数(<code>--seconds 25</code>表示设置25秒)，默认是30秒的收集时间。收集完成后悔进入pprof模式下</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/client_pprof.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/client_pprof.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/client_pprof.png" alt=""></p>
 <p>也可以通过命令收集内存<code>go tool pprof http://localhost:8080/debug/pprof/heap</code></p>
 <h2 id="pprof文件分析"><a href="#pprof文件分析" class="headerlink" title="pprof文件分析"></a>pprof文件分析</h2><p>接下来就是重点，如何分析我们pprof文件：</p>
 <p>在进入pprof状态之后，可以使用top命令来查看，最耗费资源的是哪些函数</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/analyze.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/analyze.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/analyze.png" alt=""></p>
 <p>这里分析下各个参数的意思</p>
 <h3 id="flat和cum"><a href="#flat和cum" class="headerlink" title="flat和cum:"></a>flat和cum:</h3><p>Flat表示给定函数的持续时间，cum表示当前函数的累加调用。 比如有一个函数a()调用函数b()和函数c(),</p>
 <p>函数b()耗时1秒，函数b()耗时两秒，那么cum就是1+2=3s</p>
@@ -1107,7 +1102,7 @@
 <p>安装好之后可以直接使用命令来生成图片</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@iZbp14ouog5ocoeakj39q1Z guess]# <span class="keyword">go</span> tool pprof  cpu.pprof</span><br><span class="line">Entering interactive mode (<span class="keyword">type</span> <span class="string">"help"</span> <span class="keyword">for</span> commands)</span><br><span class="line">(pprof) svg</span><br><span class="line">Generating report in profile001.svg</span><br><span class="line">(pprof)</span><br></pre></td></tr></table></figure>
 <p>这样就生成了svg图片<code>profile001.svg</code></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/sum&amp;cum&amp;flat.png" alt=""></p>
+<p><img src="/2017/08/23/Go性能分析工具/sum&amp;cum&amp;flat.png" alt=""></p>
 <p>由于我代码中并没有写太多的业务逻辑，所以这里可以看到大部分的耗时多事发生在运行时，四个耗时25%的函数是<code>runtime.memmove</code> <code>runtime.memeqbody</code> <code>runtimecgocall</code> <code>runtime.stdcall</code>.接下来，可以根据图形具体分析程序在哪里耗费资源然后进行优化</p>
 <h2 id="火焰图"><a href="#火焰图" class="headerlink" title="火焰图"></a>火焰图</h2><p>上图的结构给我们的是晦涩难懂的感觉，我们需要寻求更直观，更简单的分析工具。而且使用火焰图不需要安装graphviz</p>
 <p>go-torch是<code>Uber</code>公司开源的一款针对Go语言程序的火焰图生成工具，能收集 stack traces,并把它们整理成火焰图，直观地程序给开发人员。</p>
@@ -1131,7 +1126,7 @@
 <li><strong>-f：</strong>表示要生成的svg图片名称</li>
 </ul>
 <p>此时已经将cpu.pprof生成了cpu.svg的火焰图了，可以通过浏览器查看</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/fire1.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/fire1.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/fire1.png" alt=""></p>
 <p>这就是go-torch生成的火焰图，看起来是不是舒服多了。</p>
 <blockquote>
 <ul>
@@ -1411,9 +1406,9 @@
 <p>可以看到给出的信息比go自带的测试包多很多信息</p>
 <h4 id="1-4-2、goconvey-运行测试"><a href="#1-4-2、goconvey-运行测试" class="headerlink" title="1.4.2、goconvey 运行测试"></a>1.4.2、goconvey 运行测试</h4><p>web界面查看数据</p>
 <p>GoConvey 不仅支持在命令行进行人工调用调试命令，还有非常舒适的 Web 界面提供给开发者来进行自动化的编译测试工作。在项目目录下执行<code>goconvey</code> 同时可以打开浏览器查看localhost:8080</p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png" alt=""></p>
+<p><img src="/2017/06/23/Go单元测试/带有错误的convey.png" alt=""></p>
 <p>解析上面图片</p>
-<h3 id="1-5、GoConvey的一些功能"><a href="#1-5、GoConvey的一些功能" class="headerlink" title="1.5、GoConvey的一些功能"></a>1.5、GoConvey的一些功能</h3><h4 id="测试自动运行"><a href="#测试自动运行" class="headerlink" title="测试自动运行"></a>测试自动运行</h4><p> 只需保存<code>.go</code><img src="/home/zhaohq/blog/hexo/source/_posts/Go单元测试/更新.png" alt="文件或单击图标执行测试">。您的浏览器页面将自动更新。</p>
+<h3 id="1-5、GoConvey的一些功能"><a href="#1-5、GoConvey的一些功能" class="headerlink" title="1.5、GoConvey的一些功能"></a>1.5、GoConvey的一些功能</h3><h4 id="测试自动运行"><a href="#测试自动运行" class="headerlink" title="测试自动运行"></a>测试自动运行</h4><p> 只需保存<code>.go</code><img src="/2017/06/23/Go单元测试/更新.png" alt="文件或单击图标执行测试">。您的浏览器页面将自动更新。</p>
 <h4 id="覆盖报告"><a href="#覆盖报告" class="headerlink" title="覆盖报告"></a>覆盖报告</h4><p>可以点击左上角的软件包名称来查看<a href="http://blog.golang.org/cover#TOC_5." target="_blank" rel="noopener">Go的详细HTML覆盖率报告</a>。</p>
 <h4 id="黑暗，光和自定义主题"><a href="#黑暗，光和自定义主题" class="headerlink" title="黑暗，光和自定义主题"></a>黑暗，光和自定义主题</h4><p>GoConvey内置了两个主题。（在此页面上<a href="javascript:" target="_blank" rel="noopener">切换主题</a>以尝试！）您还可以使用第三方主题或自己滚动。</p>
 <h4 id="暂停，恢复和审查"><a href="#暂停，恢复和审查" class="headerlink" title="暂停，恢复和审查"></a>暂停，恢复和审查</h4><p>可以暂停自动测试执行，并查看最近的测试历史，以查看代码在何处，何时以及为什么中断。</p>

@@ -20,24 +20,24 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go性能分析工具">
 <meta property="og:url" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="zhqqqy">
 <meta property="og:description" content="为什么需要性能分析作为开发，一般在开发过程大多是为了功能的实现和单元测试，当业务量不大的时候，也不会说去过早的分析代码的性能。但是一旦业务量上来，原有开发中代码写的不太好的地方会造成性能瓶颈，这个时候就得需要性能分析工具帮助分析程序在哪块代码上出现了性能瓶颈。才可以有针对性的优化代码。 很幸运的，go语言官方有提供的性能工具pprof，我们可以很方便的分析程序运行过程中造成瓶颈的地方 pprof什">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/debug_pprof.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/client_pprof.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/analyze.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/sum&cum&flat.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/fire1.png">
-<meta property="og:updated_time" content="2018-08-10T02:59:42.219Z">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/debug_pprof.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/client_pprof.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/analyze.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/sum&cum&flat.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/fire1.png">
+<meta property="og:updated_time" content="2018-08-10T08:56:20.542Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go性能分析工具">
 <meta name="twitter:description" content="为什么需要性能分析作为开发，一般在开发过程大多是为了功能的实现和单元测试，当业务量不大的时候，也不会说去过早的分析代码的性能。但是一旦业务量上来，原有开发中代码写的不太好的地方会造成性能瓶颈，这个时候就得需要性能分析工具帮助分析程序在哪块代码上出现了性能瓶颈。才可以有针对性的优化代码。 很幸运的，go语言官方有提供的性能工具pprof，我们可以很方便的分析程序运行过程中造成瓶颈的地方 pprof什">
-<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/debug_pprof.png">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2017/08/23/Go性能分析工具/debug_pprof.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
 
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
 
 
 
@@ -64,7 +64,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Go性能分析工具 | Hexo</title>
+<title>Go性能分析工具 | zhqqqy</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -114,7 +114,7 @@
 
         
             <form id="search-form">
-            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
             <i class="fa fa-times" onclick="resetSearch()"></i>
             </form>
             <div id="local-search-result"></div>
@@ -331,7 +331,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/"</span>, Index)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/cmdline"</span>, Cmdline)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/profile"</span>, Profile)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/symbol"</span>, Symbol)</span><br><span class="line">	http.HandleFunc(<span class="string">"/debug/pprof/trace"</span>, Trace)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="通过浏览器分析"><a href="#通过浏览器分析" class="headerlink" title="通过浏览器分析"></a>通过浏览器分析</h4><p>pprof.go中最开始先申明一个init函数，这里申明了五个<code>HandleFunc</code>对应的可以在浏览器中可以打开着五个页面</p>
 <p><code>/debug/pprof/</code>页面是首页，可以查看go程序的堆栈、goroutine、线程等信息</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/debug_pprof.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/debug_pprof.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/debug_pprof.png" alt=""></p>
 <p>一般如果要获取cpu的信息，生成pprof文件，则直接访问<code>/debug/pprof/profile</code>，</p>
 <p>通过代码:</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Profile</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">sec, _ := strconv.ParseInt(r.FormValue(<span class="string">"seconds"</span>), <span class="number">10</span>, <span class="number">64</span>)</span><br><span class="line">	<span class="keyword">if</span> sec == <span class="number">0</span> &#123;</span><br><span class="line">		sec = <span class="number">30</span></span><br><span class="line">	&#125;</span><br><span class="line">········</span><br><span class="line">	<span class="keyword">if</span> err := pprof.StartCPUProfile(w); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// StartCPUProfile failed, so no writes yet.</span></span><br><span class="line">		<span class="comment">// Can change header back to text content</span></span><br><span class="line">		<span class="comment">// and send error code.</span></span><br><span class="line">		w.Header().Set(<span class="string">"Content-Type"</span>, <span class="string">"text/plain; charset=utf-8"</span>)</span><br><span class="line">		w.Header().Set(<span class="string">"X-Go-Pprof"</span>, <span class="string">"1"</span>)</span><br><span class="line">		w.WriteHeader(http.StatusInternalServerError)</span><br><span class="line">		fmt.Fprintf(w, <span class="string">"Could not enable CPU profiling: %s\n"</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	sleep(w, time.Duration(sec)*time.Second)</span><br><span class="line">	pprof.StopCPUProfile()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -342,11 +342,11 @@
 <h4 id="通过命令行来分析"><a href="#通过命令行来分析" class="headerlink" title="通过命令行来分析"></a>通过命令行来分析</h4><p>可以通过命令收集cpu</p>
 <p><code>go tool pprof http://localhost:8080/debug/pprof/profile</code></p>
 <p>同样可以进行数据收集，当然，可以后面设置参数(<code>--seconds 25</code>表示设置25秒)，默认是30秒的收集时间。收集完成后悔进入pprof模式下</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/client_pprof.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/client_pprof.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/client_pprof.png" alt=""></p>
 <p>也可以通过命令收集内存<code>go tool pprof http://localhost:8080/debug/pprof/heap</code></p>
 <h2 id="pprof文件分析"><a href="#pprof文件分析" class="headerlink" title="pprof文件分析"></a>pprof文件分析</h2><p>接下来就是重点，如何分析我们pprof文件：</p>
 <p>在进入pprof状态之后，可以使用top命令来查看，最耗费资源的是哪些函数</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/analyze.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/analyze.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/analyze.png" alt=""></p>
 <p>这里分析下各个参数的意思</p>
 <h3 id="flat和cum"><a href="#flat和cum" class="headerlink" title="flat和cum:"></a>flat和cum:</h3><p>Flat表示给定函数的持续时间，cum表示当前函数的累加调用。 比如有一个函数a()调用函数b()和函数c(),</p>
 <p>函数b()耗时1秒，函数b()耗时两秒，那么cum就是1+2=3s</p>
@@ -361,7 +361,7 @@
 <p>安装好之后可以直接使用命令来生成图片</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@iZbp14ouog5ocoeakj39q1Z guess]# <span class="keyword">go</span> tool pprof  cpu.pprof</span><br><span class="line">Entering interactive mode (<span class="keyword">type</span> <span class="string">"help"</span> <span class="keyword">for</span> commands)</span><br><span class="line">(pprof) svg</span><br><span class="line">Generating report in profile001.svg</span><br><span class="line">(pprof)</span><br></pre></td></tr></table></figure>
 <p>这样就生成了svg图片<code>profile001.svg</code></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/sum&amp;cum&amp;flat.png" alt=""></p>
+<p><img src="/2017/08/23/Go性能分析工具/sum&amp;cum&amp;flat.png" alt=""></p>
 <p>由于我代码中并没有写太多的业务逻辑，所以这里可以看到大部分的耗时多事发生在运行时，四个耗时25%的函数是<code>runtime.memmove</code> <code>runtime.memeqbody</code> <code>runtimecgocall</code> <code>runtime.stdcall</code>.接下来，可以根据图形具体分析程序在哪里耗费资源然后进行优化</p>
 <h2 id="火焰图"><a href="#火焰图" class="headerlink" title="火焰图"></a>火焰图</h2><p>上图的结构给我们的是晦涩难懂的感觉，我们需要寻求更直观，更简单的分析工具。而且使用火焰图不需要安装graphviz</p>
 <p>go-torch是<code>Uber</code>公司开源的一款针对Go语言程序的火焰图生成工具，能收集 stack traces,并把它们整理成火焰图，直观地程序给开发人员。</p>
@@ -385,7 +385,7 @@
 <li><strong>-f：</strong>表示要生成的svg图片名称</li>
 </ul>
 <p>此时已经将cpu.pprof生成了cpu.svg的火焰图了，可以通过浏览器查看</p>
-<p><a href="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/fire1.png"><img src="/home/zhaohq/blog/hexo/source/_posts/Go性能分析工具/fire1.png" alt="img"></a></p>
+<p><img src="/2017/08/23/Go性能分析工具/fire1.png" alt=""></p>
 <p>这就是go-torch生成的火焰图，看起来是不是舒服多了。</p>
 <blockquote>
 <ul>
@@ -407,7 +407,7 @@
         <p><span>本文标题:</span><a href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
         <p><span>发布时间:</span>2017-08-23, 17:33:44</p>
-        <p><span>最后更新:</span>2018-08-10, 10:59:42</p>
+        <p><span>最后更新:</span>2018-08-10, 16:56:20</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2017/08/23/Go性能分析工具/" title="Go性能分析工具">http://zhqqqy.github.io/2017/08/23/Go性能分析工具/</a>
             <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2017/08/23/Go性能分析工具/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -479,7 +479,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"Go性能分析工具　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"Go性能分析工具　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 

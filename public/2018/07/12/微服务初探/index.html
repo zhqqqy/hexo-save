@@ -20,21 +20,21 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="微服务初探">
 <meta property="og:url" content="http://zhqqqy.github.io/2018/07/12/微服务初探/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="zhqqqy">
 <meta property="og:description" content="初识为服务什么是微服务使用一套小服务来开发单个应用的方式，每个服务运行在独立的进程里。一般采用轻量级的通讯机制互联，并且他们可以通过自动化的方式部署。 微服务特征单一职责(只把紧密相关的业务放在一起，无关的业务独立出来，比如订单和支付作为一个服务，登录注册作为一个服务，和其他服务不紧密的比如邮件服务，短信服务可以作为一个服务) 轻量级的通信：微服务之间的访问和通信 (平台无关和语言无关，http就">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/微服务初探/客户端服务发现.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/微服务初探/服务端服务发现.png">
-<meta property="og:updated_time" content="2018-08-10T03:05:40.975Z">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/12/微服务初探/客户端服务发现.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/12/微服务初探/服务端服务发现.png">
+<meta property="og:updated_time" content="2018-08-10T08:34:01.949Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="微服务初探">
 <meta name="twitter:description" content="初识为服务什么是微服务使用一套小服务来开发单个应用的方式，每个服务运行在独立的进程里。一般采用轻量级的通讯机制互联，并且他们可以通过自动化的方式部署。 微服务特征单一职责(只把紧密相关的业务放在一起，无关的业务独立出来，比如订单和支付作为一个服务，登录注册作为一个服务，和其他服务不紧密的比如邮件服务，短信服务可以作为一个服务) 轻量级的通信：微服务之间的访问和通信 (平台无关和语言无关，http就">
-<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/微服务初探/客户端服务发现.png">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2018/07/12/微服务初探/客户端服务发现.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
 
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
 
 
 
@@ -61,7 +61,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>微服务初探 | Hexo</title>
+<title>微服务初探 | zhqqqy</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -111,7 +111,7 @@
 
         
             <form id="search-form">
-            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
             <i class="fa fa-times" onclick="resetSearch()"></i>
             </form>
             <div id="local-search-result"></div>
@@ -373,11 +373,11 @@
 <ol>
 <li>客户端的发现</li>
 </ol>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/微服务初探/客户端服务发现.png" alt=""></p>
+<p><img src="/2018/07/12/微服务初探/客户端服务发现.png" alt=""></p>
 <p>最下面有一个注册中心，当微服务启动之后，都会把自己所暴露的ip和port告诉给注册中心，然后客户端通过查询注册中心所注册的服务来得知微服务提供者的ip和port列表，然后通过本地的一些负载均衡等策略来实现对微服务的无差别访问，如果出现一些调用失败的情况，客户端也有自己的重试的规则。</p>
 <p>dubbo和motan就是这种模式</p>
 <p>服务端的发现</p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/微服务初探/服务端服务发现.png" alt=""></p>
+<p><img src="/2018/07/12/微服务初探/服务端服务发现.png" alt=""></p>
 <p>微服务还是同样的将自己的ip和port注册到注册中心，但是客户端不访问注册中心了，他不需通过注册中心指导微服务的列表，而是通过一个固有的ip去访问一个具有服务发现和负载均衡的服务，再由他将请求转发给后端的具体服务，并且将应答返回给客户端，这个服务在中间起到一个类似代理人的作用，他会从注册中心获取到具体的微服务列表，然后维护到自己的内部，然后当客户端请求一个服务的时候，他会知道客户端应该请求的是这个服务对应的哪些实例在运行，然后通过负载均衡算法去选择一个后端。</p>
 <h2 id="服务编排"><a href="#服务编排" class="headerlink" title="服务编排"></a>服务编排</h2><p>服务编排包括，服务发现，服务更新和服务的扩缩融</p>
 <p>流行的服务编排工具：</p>
@@ -393,7 +393,7 @@
         <p><span>本文标题:</span><a href="/2018/07/12/微服务初探/">微服务初探</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
         <p><span>发布时间:</span>2018-07-12, 09:58:31</p>
-        <p><span>最后更新:</span>2018-08-10, 11:05:40</p>
+        <p><span>最后更新:</span>2018-08-10, 16:34:01</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2018/07/12/微服务初探/" title="微服务初探">http://zhqqqy.github.io/2018/07/12/微服务初探/</a>
             <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/07/12/微服务初探/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -465,7 +465,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"微服务初探　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"微服务初探　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 

@@ -121,7 +121,7 @@ main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)
 
 **Figure 1**
 
-![](/home/zhaohq/blog/hexo/source/Go里面堆栈跟踪/Figure3.png)
+![](Go里面的堆栈跟踪/Figure3.png)
 
 现在让我们看一下第二个参数，它是一个string。 string也是引用类型，但此标头值是不可变的。 字符串的标头值被声明为两部分，包含指向底层字节数组的指针和字符串的长度：
 
@@ -150,7 +150,7 @@ main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)
 
 **Figure 2**
 
-![](/home/zhaohq/blog/hexo/source/Go里面堆栈跟踪/Figure2.png)
+![](Go里面的堆栈跟踪/Figure2.png)
 
 第三个参数是一个整数，它是一个单值：
 
@@ -174,7 +174,7 @@ main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)
 
 **Figure 3**
 
-![](/home/zhaohq/blog/hexo/source/Go里面堆栈跟踪/Figure1.png)
+![](Go里面的堆栈跟踪/Figure3.png)
 
 ## Methods(方法的情况)
 

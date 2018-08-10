@@ -20,21 +20,21 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go单元测试">
 <meta property="og:url" content="http://zhqqqy.github.io/2017/06/23/Go单元测试/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="zhqqqy">
 <meta property="og:description" content="为什么需要单元测试 开发程序其中很重要的一点是测试，我们如何保证代码的质量，如何保证每个函数是可运行，运行结果是正确的，又如何保证写出来的代码性能是好的，我们知道单元测试的重点在于发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决。对一个包做（单元）测试，需要写一些可以频繁（每次更新后）执行的小块测试单元来检查代码的正确性。于是我们必须写一些 Go 源文件来测试代码。测试程序必须属于">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go单元测试/更新.png">
-<meta property="og:updated_time" content="2018-08-10T02:54:16.975Z">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/06/23/Go单元测试/带有错误的convey.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2017/06/23/Go单元测试/更新.png">
+<meta property="og:updated_time" content="2018-08-10T08:28:01.357Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go单元测试">
 <meta name="twitter:description" content="为什么需要单元测试 开发程序其中很重要的一点是测试，我们如何保证代码的质量，如何保证每个函数是可运行，运行结果是正确的，又如何保证写出来的代码性能是好的，我们知道单元测试的重点在于发现程序设计或实现的逻辑错误，使问题及早暴露，便于问题的定位解决。对一个包做（单元）测试，需要写一些可以频繁（每次更新后）执行的小块测试单元来检查代码的正确性。于是我们必须写一些 Go 源文件来测试代码。测试程序必须属于">
-<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2017/06/23/Go单元测试/带有错误的convey.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
 
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
 
 
 
@@ -61,7 +61,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Go单元测试 | Hexo</title>
+<title>Go单元测试 | zhqqqy</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -111,7 +111,7 @@
 
         
             <form id="search-form">
-            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
             <i class="fa fa-times" onclick="resetSearch()"></i>
             </form>
             <div id="local-search-result"></div>
@@ -396,9 +396,9 @@
 <p>可以看到给出的信息比go自带的测试包多很多信息</p>
 <h4 id="1-4-2、goconvey-运行测试"><a href="#1-4-2、goconvey-运行测试" class="headerlink" title="1.4.2、goconvey 运行测试"></a>1.4.2、goconvey 运行测试</h4><p>web界面查看数据</p>
 <p>GoConvey 不仅支持在命令行进行人工调用调试命令，还有非常舒适的 Web 界面提供给开发者来进行自动化的编译测试工作。在项目目录下执行<code>goconvey</code> 同时可以打开浏览器查看localhost:8080</p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go单元测试/带有错误的convey.png" alt=""></p>
+<p><img src="/2017/06/23/Go单元测试/带有错误的convey.png" alt=""></p>
 <p>解析上面图片</p>
-<h3 id="1-5、GoConvey的一些功能"><a href="#1-5、GoConvey的一些功能" class="headerlink" title="1.5、GoConvey的一些功能"></a>1.5、GoConvey的一些功能</h3><h4 id="测试自动运行"><a href="#测试自动运行" class="headerlink" title="测试自动运行"></a>测试自动运行</h4><p> 只需保存<code>.go</code><img src="/home/zhaohq/blog/hexo/source/_posts/Go单元测试/更新.png" alt="文件或单击图标执行测试">。您的浏览器页面将自动更新。</p>
+<h3 id="1-5、GoConvey的一些功能"><a href="#1-5、GoConvey的一些功能" class="headerlink" title="1.5、GoConvey的一些功能"></a>1.5、GoConvey的一些功能</h3><h4 id="测试自动运行"><a href="#测试自动运行" class="headerlink" title="测试自动运行"></a>测试自动运行</h4><p> 只需保存<code>.go</code><img src="/2017/06/23/Go单元测试/更新.png" alt="文件或单击图标执行测试">。您的浏览器页面将自动更新。</p>
 <h4 id="覆盖报告"><a href="#覆盖报告" class="headerlink" title="覆盖报告"></a>覆盖报告</h4><p>可以点击左上角的软件包名称来查看<a href="http://blog.golang.org/cover#TOC_5." target="_blank" rel="noopener">Go的详细HTML覆盖率报告</a>。</p>
 <h4 id="黑暗，光和自定义主题"><a href="#黑暗，光和自定义主题" class="headerlink" title="黑暗，光和自定义主题"></a>黑暗，光和自定义主题</h4><p>GoConvey内置了两个主题。（在此页面上<a href="javascript:" target="_blank" rel="noopener">切换主题</a>以尝试！）您还可以使用第三方主题或自己滚动。</p>
 <h4 id="暂停，恢复和审查"><a href="#暂停，恢复和审查" class="headerlink" title="暂停，恢复和审查"></a>暂停，恢复和审查</h4><p>可以暂停自动测试执行，并查看最近的测试历史，以查看代码在何处，何时以及为什么中断。</p>
@@ -420,7 +420,7 @@
         <p><span>本文标题:</span><a href="/2017/06/23/Go单元测试/">Go单元测试</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
         <p><span>发布时间:</span>2017-06-23, 17:33:44</p>
-        <p><span>最后更新:</span>2018-08-10, 10:54:16</p>
+        <p><span>最后更新:</span>2018-08-10, 16:28:01</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2017/06/23/Go单元测试/" title="Go单元测试">http://zhqqqy.github.io/2017/06/23/Go单元测试/</a>
             <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2017/06/23/Go单元测试/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -492,7 +492,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"Go单元测试　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"Go单元测试　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 

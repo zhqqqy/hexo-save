@@ -128,19 +128,18 @@ consul 内使用了很多端口，理解这些端口的用处对你理解 consul
 
 ## 开发模式运行consul
 
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png)
+![](Consul安装部署/consul_dev.png)
 
 - 查看集群成员
 
 新开一个终端窗口运行`consul members`, 你可以看到Consul集群的成员.
 
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png)
+![](Consul安装部署/member_dev.png)
 
 - 浏览器查看webUI界面
 
   浏览器中输出serverip:8500,会出现consul的管理webUI
-
-  [![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png)
+![](/home/zhaohq/blog/hexo/source/_posts/image/Consul安装部署/ui_dev.png)
 
 ## 生产环境运行consul
 
@@ -180,20 +179,16 @@ consul agent -server  -data-dir /tmp/consul -node=s3 -bind=10.173.224.74 -ui  -j
 - `-join`：将agent加入到集群
 
 **此时10.174.96.52显示的信息是，当146主机和74主机加入到集群后，s1就被选举为leader**
-
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png)
+![](Consul安装部署/leader_52.png)
 
 **10.173.224.146加入到集群中后显示的信息**：
-
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png)
+![](Consul安装部署/candidate_146.png)
 
 **查看webUI**
-
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png)
+![](Consul安装部署/ui_1.png)
 
 查看三个server的名称
-
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png)
+![](Consul安装部署/ui_2.png)
 
 ### 将新服务服务注册到consul
 
@@ -249,8 +244,7 @@ func main() {
     }
 }
 ```
-
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png)
+![](Consul安装部署/ui_3.png)
 
 - `-config-dir`：配置文件目录，里面所有以.json结尾的文件都会被加载
 
@@ -297,7 +291,7 @@ agent除去设置server/client模式、数据路径之外，还最好设置node�
 
 **一张经典的consul架构图片：**
 
-[![img](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png)](/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png)
+![](Consul安装部署/consul架构图.png)
 
 - LAN gossip pool包含了同一局域网内所有节点，包括server与client。这基本上是位于同一个数据中心DC。
 - WAN gossip pool一般仅包含server，将跨越多个DC数据中心，通过互联网或广域网进行通信。

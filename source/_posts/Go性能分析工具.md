@@ -105,7 +105,7 @@ pprof.go中最开始先申明一个init函数，这里申明了五个`HandleFunc
 
 `/debug/pprof/`页面是首页，可以查看go程序的堆栈、goroutine、线程等信息
 
-[![img](/home/zhaohq/blog/hexo/source/Go性能分析工具/debug_pprof.png)](/home/zhaohq/blog/hexo/source/Go性能分析工具/debug_pprof.png)
+![](Go性能分析工具/debug_pprof.png)
 
 一般如果要获取cpu的信息，生成pprof文件，则直接访问`/debug/pprof/profile`，
 
@@ -149,7 +149,7 @@ sec, _ := strconv.ParseInt(r.FormValue("seconds"), 10, 64)
 
 同样可以进行数据收集，当然，可以后面设置参数(`--seconds 25`表示设置25秒)，默认是30秒的收集时间。收集完成后悔进入pprof模式下
 
-[![img](/home/zhaohq/blog/hexo/source/Go性能分析工具/client_pprof.png)](/home/zhaohq/blog/hexo/source/Go性能分析工具/client_pprof.png)
+![](Go性能分析工具/client_pprof.png)
 
 也可以通过命令收集内存`go tool pprof http://localhost:8080/debug/pprof/heap`
 
@@ -159,7 +159,7 @@ sec, _ := strconv.ParseInt(r.FormValue("seconds"), 10, 64)
 
 在进入pprof状态之后，可以使用top命令来查看，最耗费资源的是哪些函数
 
-[![img](/home/zhaohq/blog/hexo/source/Go性能分析工具/analyze.png)](/home/zhaohq/blog/hexo/source/Go性能分析工具/analyze.png)
+![](Go性能分析工具/analyze.png)
 
 这里分析下各个参数的意思
 
@@ -205,7 +205,7 @@ Generating report in profile001.svg
 
 这样就生成了svg图片`profile001.svg`
 
-![](/home/zhaohq/blog/hexo/source/Go性能分析工具/sum&cum&flat.png)
+![](Go性能分析工具/sum&cum&flat.png)
 
 
 由于我代码中并没有写太多的业务逻辑，所以这里可以看到大部分的耗时多事发生在运行时，四个耗时25%的函数是`runtime.memmove` `runtime.memeqbody` `runtimecgocall` `runtime.stdcall`.接下来，可以根据图形具体分析程序在哪里耗费资源然后进行优化
@@ -284,7 +284,7 @@ INFO[12:38:16] Writing svg to cpu.svg
 
 此时已经将cpu.pprof生成了cpu.svg的火焰图了，可以通过浏览器查看
 
-[![img](/home/zhaohq/blog/hexo/source/Go性能分析工具/fire1.png)](/home/zhaohq/blog/hexo/source/Go性能分析工具/fire1.png)
+![](Go性能分析工具/fire1.png)
 
 这就是go-torch生成的火焰图，看起来是不是舒服多了。
 

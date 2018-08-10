@@ -284,9 +284,9 @@ redis.conf 配置中 pidfile、logfile 默认保存在 `/tmp` 目录，若启动
 ### 通过fe添加group
 
 通过web浏览器访问集群管理页面(fe地址:127.0.0.1:8080) 选择我们刚搭建的集群 codis-demo，在 Proxy 栏可看到我们已经启动的 Proxy， 但是 Group 栏为空，因为我们启动的 codis-server 并未加入到集群 添加 `NEW GROUP`，`NEW GROUP` 行输入 1，再点击 `NEW GROUP` 即可 添加 Codis Server，`Add Server` 行输入我们刚刚启动的 codis-server 地址，添加到我们刚新建的 Group，然后再点击 `Add Server` 按钮即可，如下图所示
-![](/home/zhaohq/blog/hexo/source/codis安装及配置/addgroup.jpg)
+![](codis安装及配置/addgroup.jpg)
 ### 通过fe初始化slot
 
 新增的集群 slot 状态是 offline，因此我们需要对它进行初始化（将 1024 个 slot 分配到各个 group），而初始化最快的方法可通过 fe 提供的 `rebalance all slots` 按钮来做，如下图所示，点击此按钮，我们即快速完成了一个集群的搭建。
-![](/home/zhaohq/blog/hexo/source/codis安装及配置/rebalance_slots.jpg)
+![](codis安装及配置/rebalance_slots.jpg)
 每次增加组之后就需要重新执行**Rebalance All Slots**

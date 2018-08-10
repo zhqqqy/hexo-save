@@ -20,28 +20,28 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Consul安装部署">
 <meta property="og:url" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="zhqqqy">
 <meta property="og:description" content="什么是Consul 是一个服务管理软件。 支持多数据中心下，分布式高可用的，服务发现和配置共享。 consul支持健康检查，允许存储键值对。 一致性协议采用 Raft 算法,用来保证服务的高可用. 成员管理和消息广播 采用GOSSIP协议，支持ACL访问控制。  ACL技术 在路由器中被广泛采用，它是一种基于包过滤的流控制技术。控制列表通过把源地址、目的地址及端口号作为数据包检查的基本元素，并可以">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
-<meta property="og:updated_time" content="2018-08-10T01:38:36.677Z">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png">
+<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/image/Consul安装部署/ui_dev.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/consul架构图.png">
+<meta property="og:updated_time" content="2018-08-10T08:25:22.937Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Consul安装部署">
 <meta name="twitter:description" content="什么是Consul 是一个服务管理软件。 支持多数据中心下，分布式高可用的，服务发现和配置共享。 consul支持健康检查，允许存储键值对。 一致性协议采用 Raft 算法,用来保证服务的高可用. 成员管理和消息广播 采用GOSSIP协议，支持ACL访问控制。  ACL技术 在路由器中被广泛采用，它是一种基于包过滤的流控制技术。控制列表通过把源地址、目的地址及端口号作为数据包检查的基本元素，并可以">
-<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
 
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
 
 
 
@@ -68,7 +68,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Consul安装部署 | Hexo</title>
+<title>Consul安装部署 | zhqqqy</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -118,7 +118,7 @@
 
         
             <form id="search-form">
-            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
             <i class="fa fa-times" onclick="resetSearch()"></i>
             </form>
             <div id="local-search-result"></div>
@@ -473,16 +473,15 @@
 </tr>
 </tbody>
 </table>
-<h1 id="Consul运行"><a href="#Consul运行" class="headerlink" title="Consul运行"></a>Consul运行</h1><h2 id="开发模式运行consul"><a href="#开发模式运行consul" class="headerlink" title="开发模式运行consul"></a>开发模式运行consul</h2><p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul_dev.png" alt="img"></a></p>
+<h1 id="Consul运行"><a href="#Consul运行" class="headerlink" title="Consul运行"></a>Consul运行</h1><h2 id="开发模式运行consul"><a href="#开发模式运行consul" class="headerlink" title="开发模式运行consul"></a>开发模式运行consul</h2><p><img src="/2018/07/13/Consul安装部署/consul_dev.png" alt=""></p>
 <ul>
 <li>查看集群成员</li>
 </ul>
 <p>新开一个终端窗口运行<code>consul members</code>, 你可以看到Consul集群的成员.</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/member_dev.png" alt="img"></a></p>
+<p><img src="/2018/07/13/Consul安装部署/member_dev.png" alt=""></p>
 <ul>
 <li><p>浏览器查看webUI界面</p>
-<p>浏览器中输出serverip:8500,会出现consul的管理webUI</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_dev.png" alt="img"></a></p>
+<p>浏览器中输出serverip:8500,会出现consul的管理webUI<br><img src="/home/zhaohq/blog/hexo/source/_posts/image/Consul安装部署/ui_dev.png" alt=""></p>
 </li>
 </ul>
 <h2 id="生产环境运行consul"><a href="#生产环境运行consul" class="headerlink" title="生产环境运行consul"></a>生产环境运行consul</h2><h3 id="启动三台server服务器"><a href="#启动三台server服务器" class="headerlink" title="启动三台server服务器"></a>启动三台server服务器</h3><p> agent可以运行为server或client模式.每个数据中心至少必须拥有一台server . 建议在一个集群中有3或者5个server.部署单一的server,在出现失败时会不可避免的造成数据丢失.</p>
@@ -498,14 +497,10 @@
 <li><code>-data-dir</code>：提供一个目录用来存放agent的状态，所有的agent允许都需要该目录，该目录必须是稳定的，系统重启后都继续存在</li>
 <li><code>-join</code>：将agent加入到集群</li>
 </ul>
-<p><strong>此时10.174.96.52显示的信息是，当146主机和74主机加入到集群后，s1就被选举为leader</strong></p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/leader_52.png" alt="img"></a></p>
-<p><strong>10.173.224.146加入到集群中后显示的信息</strong>：</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/candidate_146.png" alt="img"></a></p>
-<p><strong>查看webUI</strong></p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_1.png" alt="img"></a></p>
-<p>查看三个server的名称</p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_2.png" alt="img"></a></p>
+<p><strong>此时10.174.96.52显示的信息是，当146主机和74主机加入到集群后，s1就被选举为leader</strong><br><img src="/2018/07/13/Consul安装部署/leader_52.png" alt=""></p>
+<p><strong>10.173.224.146加入到集群中后显示的信息</strong>：<br><img src="/2018/07/13/Consul安装部署/candidate_146.png" alt=""></p>
+<p><strong>查看webUI</strong><br><img src="/2018/07/13/Consul安装部署/ui_1.png" alt=""></p>
+<p>查看三个server的名称<br><img src="/2018/07/13/Consul安装部署/ui_2.png" alt=""></p>
 <h3 id="将新服务服务注册到consul"><a href="#将新服务服务注册到consul" class="headerlink" title="将新服务服务注册到consul"></a>将新服务服务注册到consul</h3><p>consul 支持两种服务发现的方式：</p>
 <ol>
 <li>通过 HTTP API 方式，这种方式需要额外编程，适用于不安装 consul agent 的情况，<a href="https://www.consul.io/api/catalog.html" target="_blank" rel="noopener">文档地址</a>。</li>
@@ -516,7 +511,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleExample</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    w.Write([]<span class="keyword">byte</span>(<span class="string">"hello man"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleHealth</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"health check!"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    http.HandleFunc(<span class="string">"/"</span>, HandleExample)</span><br><span class="line">    http.HandleFunc(<span class="string">"/health"</span>, HandleHealth)</span><br><span class="line"></span><br><span class="line">    fmt.Println(<span class="string">"listen on :9000"</span>)</span><br><span class="line">    http.ListenAndServe(<span class="string">":9000"</span>, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后编辑一个配置文件 <code>/etc/consul.d/web.json</code>：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"service"</span>:</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"name"</span>: <span class="string">"web"</span>,</span><br><span class="line">        <span class="attr">"tags"</span>: [<span class="string">"primary"</span>],</span><br><span class="line">        <span class="attr">"address"</span>: <span class="string">"10.174.96.52"</span>,</span><br><span class="line">        <span class="attr">"port"</span>: <span class="number">9000</span>,</span><br><span class="line">        <span class="attr">"checks"</span>: [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">"http"</span>: <span class="string">"http://localhost:9000/health"</span>,</span><br><span class="line">            <span class="attr">"interval"</span>: <span class="string">"10s"</span></span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/ui_3.png" alt="img"></a></p>
+<p><img src="/2018/07/13/Consul安装部署/ui_3.png" alt=""></p>
 <ul>
 <li><code>-config-dir</code>：配置文件目录，里面所有以.json结尾的文件都会被加载</li>
 </ul>
@@ -538,7 +533,7 @@
 </ul>
 <p>agent除去设置server/client模式、数据路径之外，还最好设置node的名称和ip。</p>
 <p><strong>一张经典的consul架构图片：</strong></p>
-<p><a href="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png"><img src="/home/zhaohq/blog/zhqqqy.github.io/2018/07/13/Consul安装部署/consul%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="img"></a></p>
+<p><img src="/2018/07/13/Consul安装部署/consul架构图.png" alt=""></p>
 <ul>
 <li>LAN gossip pool包含了同一局域网内所有节点，包括server与client。这基本上是位于同一个数据中心DC。</li>
 <li>WAN gossip pool一般仅包含server，将跨越多个DC数据中心，通过互联网或广域网进行通信。</li>
@@ -558,7 +553,7 @@
         <p><span>本文标题:</span><a href="/2018/07/13/Consul安装部署/">Consul安装部署</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
         <p><span>发布时间:</span>2018-07-13, 15:45:07</p>
-        <p><span>最后更新:</span>2018-08-10, 09:38:36</p>
+        <p><span>最后更新:</span>2018-08-10, 16:25:22</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2018/07/13/Consul安装部署/" title="Consul安装部署">http://zhqqqy.github.io/2018/07/13/Consul安装部署/</a>
             <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/07/13/Consul安装部署/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -630,7 +625,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"Consul安装部署　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"Consul安装部署　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 

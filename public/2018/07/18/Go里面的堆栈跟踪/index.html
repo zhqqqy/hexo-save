@@ -20,22 +20,22 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go里面的堆栈跟踪">
 <meta property="og:url" content="http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="zhqqqy">
 <meta property="og:description" content="转载翻译，原文地址：Stack Traces In Go Go里面的堆栈跟踪在Go语言中有一些调试技巧能帮助我们快速找到问题，有时候你想尽可能多的记录异常但仍觉得不够，搞清楚堆栈的意义有助于定位Bug或者记录更完整的信息。 本文将讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。 Functions (函数的情况)先从这段代码开始： 清单112345678910package mainfunc">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure2.png">
-<meta property="og:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure1.png">
-<meta property="og:updated_time" content="2018-08-10T03:02:59.826Z">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/Figure3.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/Figure2.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/Figure3.png">
+<meta property="og:updated_time" content="2018-08-10T08:07:40.545Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go里面的堆栈跟踪">
 <meta name="twitter:description" content="转载翻译，原文地址：Stack Traces In Go Go里面的堆栈跟踪在Go语言中有一些调试技巧能帮助我们快速找到问题，有时候你想尽可能多的记录异常但仍觉得不够，搞清楚堆栈的意义有助于定位Bug或者记录更完整的信息。 本文将讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。 Functions (函数的情况)先从这段代码开始： 清单112345678910package mainfunc">
-<meta name="twitter:image" content="http://zhqqqy.github.io/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/Figure3.png">
 
 <link rel="apple-touch-icon" href= "/apple-touch-icon.png">
 
 
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
 
 
 
@@ -62,7 +62,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>Go里面的堆栈跟踪 | Hexo</title>
+<title>Go里面的堆栈跟踪 | zhqqqy</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -112,7 +112,7 @@
 
         
             <form id="search-form">
-            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="" />
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
             <i class="fa fa-times" onclick="resetSearch()"></i>
             </form>
             <div id="local-search-result"></div>
@@ -332,19 +332,19 @@
 <h3 id="清单5"><a href="#清单5" class="headerlink" title="清单5"></a>清单5</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// Slice parameter value</span><br><span class="line">slice := make([]string, 2, 4)</span><br><span class="line"></span><br><span class="line">// Slice header values</span><br><span class="line">Pointer:  0x2080c3f50</span><br><span class="line">Length:   0x2</span><br><span class="line">Capacity: 0x4</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
 <p><strong>清单5</strong> 显示了堆栈跟踪中的前三个值如何与slice参数匹配。 第一个值表示指向底层字符串数组的指针。 用于初始化slice的长度和容量的数字与第二个和第三个值匹配 。这三个值表示切片标头的每个值，即Example函数的第一个参数。</p>
 <p><strong>Figure 1</strong></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure3.png" alt=""></p>
+<p><img src="/2018/07/18/Go里面的堆栈跟踪/Figure3.png" alt=""></p>
 <p>现在让我们看一下第二个参数，它是一个string。 string也是引用类型，但此标头值是不可变的。 字符串的标头值被声明为两部分，包含指向底层字节数组的指针和字符串的长度：</p>
 <h3 id="清单6"><a href="#清单6" class="headerlink" title="清单6"></a>清单6</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// String parameter value</span><br><span class="line">&quot;hello&quot;</span><br><span class="line"></span><br><span class="line">// String header values</span><br><span class="line">Pointer: 0x425c0</span><br><span class="line">Length:  0x5</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
 <p><strong>清单6</strong>显示了堆栈跟踪中的第四个和第五个值如何与string参数匹配。 第四个值表示指向底层字节数组的指针，第五个值表示字符串的长度为5。字符串</p>
 <p>“hello”</p>
 <p>需要5个字节。 这两个值表示字符串标题的每个值，即Example函数的第二个参数。</p>
 <p><strong>Figure 2</strong></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure2.png" alt=""></p>
+<p><img src="/2018/07/18/Go里面的堆栈跟踪/Figure2.png" alt=""></p>
 <p>第三个参数是一个整数，它是一个单值：</p>
 <h3 id="清单7"><a href="#清单7" class="headerlink" title="清单7"></a>清单7</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// Integer parameter value</span><br><span class="line">10</span><br><span class="line"></span><br><span class="line">// Integer value</span><br><span class="line">Base 16: 0xa</span><br><span class="line"></span><br><span class="line">// Declaration</span><br><span class="line">main.Example(slice []string, str string, i int)</span><br><span class="line"></span><br><span class="line">// Stack trace</span><br><span class="line">main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)</span><br></pre></td></tr></table></figure>
 <p><strong>清单7</strong>显示了堆栈跟踪中的最后一个值如何与int类型的参数匹配。 trace中的最后一个值是十六进制数0xa，它的值是10.与该参数传递的值相同。 该值代表Example函数中的第三个参数。</p>
 <p><strong>Figure 3</strong></p>
-<p><img src="/home/zhaohq/blog/hexo/source/_posts/Go里面堆栈跟踪/Figure1.png" alt=""></p>
+<p><img src="/2018/07/18/Go里面的堆栈跟踪/Figure3.png" alt=""></p>
 <h2 id="Methods-方法的情况"><a href="#Methods-方法的情况" class="headerlink" title="Methods(方法的情况)"></a>Methods(方法的情况)</h2><p>如果我们将Example作为结构体的方法会怎么样呢?</p>
 <h3 id="清单8"><a href="#清单8" class="headerlink" title="清单8"></a>清单8</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">01</span> <span class="keyword">package</span> main</span><br><span class="line"><span class="number">02</span></span><br><span class="line"><span class="number">03</span> <span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"><span class="number">04</span></span><br><span class="line"><span class="number">05</span> <span class="keyword">type</span> trace <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"><span class="number">06</span></span><br><span class="line"><span class="number">07</span> <span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"><span class="number">08</span>     slice := <span class="built_in">make</span>([]<span class="keyword">string</span>, <span class="number">2</span>, <span class="number">4</span>)</span><br><span class="line"><span class="number">09</span></span><br><span class="line"><span class="number">10</span>     <span class="keyword">var</span> t trace</span><br><span class="line"><span class="number">11</span>     t.Example(slice, <span class="string">"hello"</span>, <span class="number">10</span>)</span><br><span class="line"><span class="number">12</span> &#125;</span><br><span class="line"><span class="number">13</span></span><br><span class="line"><span class="number">14</span> <span class="function"><span class="keyword">func</span> <span class="params">(t *trace)</span> <span class="title">Example</span><span class="params">(slice []<span class="keyword">string</span>, str <span class="keyword">string</span>, i <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line"><span class="number">15</span>     fmt.Printf(<span class="string">"Receiver Address: %p\n"</span>, t)</span><br><span class="line"><span class="number">16</span>     <span class="built_in">panic</span>(<span class="string">"Want stack trace"</span>)</span><br><span class="line"><span class="number">17</span> &#125;</span><br></pre></td></tr></table></figure>
 <p><strong>清单8</strong>通过在第05行声明一个名为trace的新类型，并更改程序，将Example申明为trace类型的方法。通过使用trace类型的指针接收器重新声明该函数来完成转换。 然后在第10行，将变量t申明为trace类型，并且在第11行进行方法调用。</p>
@@ -370,7 +370,7 @@
         <p><span>本文标题:</span><a href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
         <p><span>发布时间:</span>2018-07-18, 13:54:48</p>
-        <p><span>最后更新:</span>2018-08-10, 11:02:59</p>
+        <p><span>最后更新:</span>2018-08-10, 16:07:40</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2018/07/18/Go里面的堆栈跟踪/" title="Go里面的堆栈跟踪">http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/</a>
             <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/07/18/Go里面的堆栈跟踪/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -436,7 +436,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"Go里面的堆栈跟踪　| Hexo　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"Go里面的堆栈跟踪　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
