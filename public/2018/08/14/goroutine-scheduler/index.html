@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="一、Goroutine调度器goroutine是golang内置的协程，当我需要并发执行一些任务的时候，在go语言中可以使用go关键字来创建goroutine。 123go func()&amp;#123;   // dosth&amp;#125;() 相比于c++和java等语言创建线程，go语言创建的goroutine是在进程和线程的基础上做更高层次的抽象，Go采用了用户层轻量级thread或者说是类coro">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="goroutine scheduler">
+<meta property="og:url" content="http://zhqqqy.github.io/2018/08/14/goroutine-scheduler/index.html">
+<meta property="og:site_name" content="zhqqqy">
+<meta property="og:description" content="一、Goroutine调度器goroutine是golang内置的协程，当我需要并发执行一些任务的时候，在go语言中可以使用go关键字来创建goroutine。 123go func()&amp;#123;   // dosth&amp;#125;() 相比于c++和java等语言创建线程，go语言创建的goroutine是在进程和线程的基础上做更高层次的抽象，Go采用了用户层轻量级thread或者说是类coro">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/08/14/goroutine-scheduler/sketch.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/08/14/goroutine-scheduler/scheduler.jpg">
+<meta property="og:updated_time" content="2018-08-14T09:12:09.505Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="goroutine scheduler">
+<meta name="twitter:description" content="一、Goroutine调度器goroutine是golang内置的协程，当我需要并发执行一些任务的时候，在go语言中可以使用go关键字来创建goroutine。 123go func()&amp;#123;   // dosth&amp;#125;() 相比于c++和java等语言创建线程，go语言创建的goroutine是在进程和线程的基础上做更高层次的抽象，Go采用了用户层轻量级thread或者说是类coro">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2018/08/14/goroutine-scheduler/sketch.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>goroutine scheduler | zhqqqy</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-goroutine-scheduler" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/08/14/goroutine-scheduler/" class="article-date">
+      <time datetime="2018-08-14T07:24:00.000Z" itemprop="datePublished">2018-08-14</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      goroutine scheduler
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/Golang/">Golang</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="一、Goroutine调度器"><a href="#一、Goroutine调度器" class="headerlink" title="一、Goroutine调度器"></a>一、Goroutine调度器</h2><p>goroutine是golang内置的协程，当我需要并发执行一些任务的时候，在go语言中可以使用go关键字来创建goroutine。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span>&#123;</span><br><span class="line">   <span class="comment">// dosth</span></span><br><span class="line">&#125;()</span><br></pre></td></tr></table></figure>
+<p>相比于c++和java等语言创建线程，go语言创建的goroutine是在进程和线程的基础上做更高层次的抽象，Go采用了<strong>用户层轻量级thread</strong>或者说是<strong>类coroutine</strong>的概念来解决这些问题，Go将之称为”<strong>goroutine</strong>“。goroutine占用的资源非常小(<a href="http://tonybai.com/2014/11/04/some-changes-in-go-1-4/" target="_blank" rel="noopener">Go 1.4</a>将每个goroutine stack的size默认设置为2k)，goroutine调度的切换也不用陷入(trap)操作系统内核层完成，代价很低。因此，一个Go程序中可以创建成千上万个并发的goroutine。所有的Go代码都在goroutine中执行，哪怕是go的runtime也不例外。将这些goroutines按照一定算法放到“<em>CPU</em>”上执行的程序就称为<strong>goroutine调度器</strong>或<strong>goroutine scheduler</strong>。</p>
+<p>但是针对操作系统层面，操作系统是不知道goroutine的存在的，goroutine的调度全部是靠自己内部完成的，实现Go程序内goroutine之间“公平”的竞争“CPU”资源，这个任务就落到了Go runtime头上，要知道在一个Go程序中，除了用户代码，剩下的就是go runtime了。</p>
+<h2 id="二、Go调度器模型与演化过程"><a href="#二、Go调度器模型与演化过程" class="headerlink" title="二、Go调度器模型与演化过程"></a>二、Go调度器模型与演化过程</h2><p>goroutine是通过三种基本对象互相协作(GMP)，来实现在用户空间管理和调度并发任务。</p>
+<p>基本关系是</p>
+<p><img src="/2018/08/14/goroutine-scheduler/sketch.png" alt="来自go语言学习笔记"></p>
+<p><strong>此图来自雨痕的go语言学习笔记</strong></p>
+<blockquote>
+<ol>
+<li><p>首先是Processor(简称P):</p>
+<p>​    他的作用类似于CPU核，用来控制可同时并发执行的任务数，每个工作线程都必须绑定一个有效P才被允许执行任务。否则只能休眠。直到有空闲P时被唤醒，P还为线程提供执行资源，比如<code>内存分配</code>，<code>本地任务队列</code>等。线程独享所绑定的P资源，可以在无锁状态下执行高效操作。</p>
+</li>
+<li><p>其次是Goroutine(简称G):</p>
+<p>​    进程内一切都在以goroutine方式运行，包括运行时相关的服务，以及mani.main入口函数。需要指出，G并非执行体，他仅仅保存并发任务状态，为任务执行提供所需的栈内存空间。G任务创建后被放置在P本地队列火全局队列，等待工作线程调度执行</p>
+</li>
+<li><p>最后是系统线程machine(简称M):</p>
+<p>​    实际执行体是系统线程和p绑定，以调度循环方式不停执行G并发任务。M通过修改寄存器，将执行栈指向G自带的栈内存，并在此空间内分配堆栈帧，执行任务函数。当需要中途切换的时候，只要将相关寄存器值保存回G空间即可维持状态，任何M都可以据此恢复执行。线程仅负责执行。不在持有状态，这是并发任务跨线程调度，实现多路复用的根本所在。</p>
+</li>
+</ol>
+</blockquote>
+<p>虽然<strong>P/M</strong>构成执行组合体，但两者数量不是一一对应的。通常情况下，p的数量相对恒定，默认是cpu的核心数。但是也可以更多或者更少，可以通过<code>runtime.GOMAXPROCS()</code>函数来设置。但是<strong>M</strong>则是由调度器按需创建的，举例来说，当M因陷入系统调用而长时间阻塞时，p会被健康线程抢回去，去新建（或唤醒）一个去执行其他任务，这样M的数量就会增长。</p>
+<p><strong>优点：</strong></p>
+<p>​    因为G初始栈仅有2KB,且创建操作只是在用户空间简单的分配对象，远比要进入内核态分配线程要简单的多。</p>
+<p>调度器让多个M进入调度循环，不停获取并执行任务，这样就可以创建成千上万个并发任务。</p>
+<p><strong>疑问：</strong></p>
+<p>​    其实按照上面的描述，goroutine调度队列只需要有M和g就可以了，用户呢创建goroutine，go运行时机制去创建线程来调度goroutine就可以，为什么要增加一个p来作为中间层呢？</p>
+<p><strong>解析：</strong></p>
+<p>​    查了资料之后，发现原来<a href="https://blog.golang.org/go-version-1-is-released" target="_blank" rel="noopener">Go 1.0正式发布</a>的时候确实是实现的G-M模型，并没有P的存在，但是此模型存在一系列不足，前Intel blackbelt工程师、现Google工程师<a href="https://github.com/dvyukov" target="_blank" rel="noopener">Dmitry Vyukov</a>在其《<a href="https://docs.google.com/document/d/1TTj4T2JO42uD5ID9e89oa0sLKhJYD0Y_kqxDv3I3XMw/edit#!" target="_blank" rel="noopener">Scalable Go Scheduler Design</a>》一文中指出了<strong>G-M模型</strong>的一个重要不足： 限制了Go并发程序的伸缩性，尤其是对那些有高吞吐或并行计算需求的服务程序。主要体现在如下几个方面：</p>
+<blockquote>
+<ol>
+<li>单一全局互斥锁(Sched.Lock)和集中状态存储的存在导致所有goroutine相关操作，比如：创建、重新调度等都要上锁；</li>
+<li>goroutine传递问题：M经常在M之间传递”可运行”的goroutine，这导致调度延迟增大以及额外的性能损耗；</li>
+<li>每个M做内存缓存，导致内存占用过高，数据局部性较差；</li>
+<li>由于syscall调用而形成的剧烈的worker thread阻塞和解除阻塞，导致额外的性能损耗</li>
+</ol>
+</blockquote>
+<p>于是Dmitry Vyukov亲自操刀改进Go scheduler，在<a href="https://golang.org/doc/go1.1" target="_blank" rel="noopener">Go 1.1</a>中实现了<strong>G-P-M调度模型</strong>和<a href="http://supertech.csail.mit.edu/papers/steal.pdf" target="_blank" rel="noopener">work stealing算法</a>，这个模型一直沿用至今</p>
+<blockquote>
+<ul>
+<li>G: 表示goroutine，存储了goroutine的执行stack信息、goroutine状态以及goroutine的任务函数等；另外G对象是可以重用的。</li>
+<li>P: 表示逻辑processor，P的数量决定了系统内最大可<strong>并行</strong>的G的数量（前提：系统的物理cpu核数&gt;=P的数量）；P的最大作用还是其拥有的各种G对象队列、链表、一些cache和状态。</li>
+<li>M: M代表着真正的执行计算资源。在绑定有效的p后，进入schedule循环；而schedule循环的机制大致是从各种队列、p的本地队列中获取G，切换到G的执行栈上并执行G的函数，调用goexit做清理工作并回到m，如此反复。M并不保留G状态，这是G可以跨M调度的基础。</li>
+</ul>
+</blockquote>
+<p><img src="/2018/08/14/goroutine-scheduler/scheduler.jpg" alt="preview"></p>
+<ul>
+<li><p>当一个OS线程M0陷入阻塞时(一般是channel阻塞或network I/O阻塞或者system call阻塞)，P转而在OS线程M1上运行。调度器保证有足够的线程来运行所以的context P。图中的M1可能是被创建，或者从线程缓存中取出。当M0返回时，它必须尝试取得一个context P来运行goroutine，一般情况下，它会从其他的OS线程那里steal偷一个context P过来，如果没有偷到的话，它就把goroutine放在一个global runqueue里，然后自己就去睡大觉了（放入线程缓存里）。Contexts P们也会周期性的检查global runqueue，否则global runqueue上的goroutine永远无法执行</p>
+</li>
+<li><p>另一种情况是P所分配的任务G很快就执行完了（分配不均），这就导致了一个上下文P闲着没事儿干而系统却任然忙碌。但是如果global runqueue没有任务G了，那么P就不得不从其他的上下文P那里拿一些G来执行。一般来说，如果上下文P从其他的上下文P那里要偷一个任务的话，一般就‘偷’run queue的一半，这就确保了每个OS线程都能充分的使用。</p>
+</li>
+</ul>
+<h2 id="三、调度器状态的查看方法"><a href="#三、调度器状态的查看方法" class="headerlink" title="三、调度器状态的查看方法"></a>三、调度器状态的查看方法</h2><p>Go提供了调度器当前状态的查看方法：使用Go运行时环境变量GODEBUG。 </p>
+<p>GODEBUG这个Go运行时环境变量很是强大，通过给其传入不同的key1=value1,key2=value2… 组合，Go的runtime会输出不同的调试信息，比如在这里我们给GODEBUG传入了”schedtrace=1000″，其含义就是每1000ms，打印输出一次goroutine scheduler的状态，每次一行。每一行各字段含义如下：</p>
+<blockquote>
+<p>SCHED 6016ms: gomaxprocs=4 idleprocs=0 threads=26 spinningthreads=0 idlethreads=20 runqueue=1 [3 4 0 10] </p>
+<p>SCHED：调试信息输出标志字符串，代表本行是goroutine scheduler的输出；</p>
+<p> 6016ms：即从程序启动到输出这行日志的时间； </p>
+<p>gomaxprocs: P的数量；</p>
+<p> idleprocs: 处于idle状态的P的数量；通过gomaxprocs和idleprocs的差值，我们就可知道执行go代码的P的数量； </p>
+<p>threads: os threads的数量，包含scheduler使用的m数量，加上runtime自用的类似sysmon这样的thread的数量； </p>
+<p>spinningthreads: 处于自旋状态的os thread数量； </p>
+<p>idlethread: 处于idle状态的os thread的数量；</p>
+<p> runqueue=1： go scheduler全局队列中G的数量；</p>
+<p> [3 4 0 10]: 分别为4个P的local queue中的G的数量。 </p>
+</blockquote>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://tonybai.com/2017/06/23/an-intro-about-goroutine-scheduler/" target="_blank" rel="noopener">也谈goroutine调度器</a></p>
+<p>Go语言学习笔记<br><a href="https://www.zhihu.com/question/20862617" target="_blank" rel="noopener">Golang 的 goroutine 是如何实现的？</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/08/14/goroutine-scheduler/">goroutine scheduler</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
+        <p><span>发布时间:</span>2018-08-14, 15:24:00</p>
+        <p><span>最后更新:</span>2018-08-14, 17:12:09</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/08/14/goroutine-scheduler/" title="goroutine scheduler">http://zhqqqy.github.io/2018/08/14/goroutine-scheduler/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/08/14/goroutine-scheduler/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/07/18/Go里面的堆栈跟踪/">
+                    Go里面的堆栈跟踪
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、Goroutine调度器"><span class="toc-number">1.</span> <span class="toc-text">一、Goroutine调度器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、Go调度器模型与演化过程"><span class="toc-number">2.</span> <span class="toc-text">二、Go调度器模型与演化过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、调度器状态的查看方法"><span class="toc-number">3.</span> <span class="toc-text">三、调度器状态的查看方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#参考"><span class="toc-number"></span> <span class="toc-text">参考</span></a>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"goroutine scheduler　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/07/18/Go里面的堆栈跟踪/" title="下一篇: Go里面的堆栈跟踪">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/14/goroutine-scheduler/">goroutine scheduler</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
