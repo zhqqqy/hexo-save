@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="zhqqqy" />
+
+
+
+<meta name="description" content="第1步 - 初始化MasterKubeadm已安装在节点上。软件包适用于Ubuntu 16.04 +，CentOS 7或HypriotOS v1.0.1 +。初始化集群的第一个阶段是启动主节点。主服务器负责运行控制平面组件，etcd和API服务器。客户端将与API通信以调度工作负载并管理群集的状态。 任务 下面的命令将使用已知token初始化集群，以简化以下步骤 1categories: redi">
+<meta name="keywords" content="k8s,kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Kubeadm启动多节点群集">
+<meta property="og:url" content="http://zhqqqy.github.io/2018/08/17/k8s集群初体验/index.html">
+<meta property="og:site_name" content="zhqqqy">
+<meta property="og:description" content="第1步 - 初始化MasterKubeadm已安装在节点上。软件包适用于Ubuntu 16.04 +，CentOS 7或HypriotOS v1.0.1 +。初始化集群的第一个阶段是启动主节点。主服务器负责运行控制平面组件，etcd和API服务器。客户端将与API通信以调度工作负载并管理群集的状态。 任务 下面的命令将使用已知token初始化集群，以简化以下步骤 1categories: redi">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/08/17/k8s集群初体验/docker-ps.png">
+<meta property="og:image" content="http://zhqqqy.github.io/2018/08/17/k8s集群初体验/dashboard.png">
+<meta property="og:updated_time" content="2018-08-17T03:10:49.911Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Kubeadm启动多节点群集">
+<meta name="twitter:description" content="第1步 - 初始化MasterKubeadm已安装在节点上。软件包适用于Ubuntu 16.04 +，CentOS 7或HypriotOS v1.0.1 +。初始化集群的第一个阶段是启动主节点。主服务器负责运行控制平面组件，etcd和API服务器。客户端将与API通信以调度工作负载并管理群集的状态。 任务 下面的命令将使用已知token初始化集群，以简化以下步骤 1categories: redi">
+<meta name="twitter:image" content="http://zhqqqy.github.io/2018/08/17/k8s集群初体验/docker-ps.png">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>使用Kubeadm启动多节点群集 | zhqqqy</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">zhqqqy</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k8s-kubernetes/">k8s,kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">zhqqqy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">zhqqqy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-k8s集群初体验" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/08/17/k8s集群初体验/" class="article-date">
+      <time datetime="2018-08-17T02:40:19.000Z" itemprop="datePublished">2018-08-17</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用Kubeadm启动多节点群集
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/kubernetes/">kubernetes</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/k8s-kubernetes/">k8s,kubernetes</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h4 id="第1步-初始化Master"><a href="#第1步-初始化Master" class="headerlink" title="第1步 - 初始化Master"></a>第1步 - 初始化Master</h4><p>Kubeadm已安装在节点上。软件包适用于Ubuntu 16.04 +，CentOS 7或HypriotOS v1.0.1 +。初始化集群的第一个阶段是启动主节点。主服务器负责运行控制平面组件，etcd和API服务器。客户端将与API通信以调度工作负载并管理群集的状态。</p>
+<h5 id="任务"><a href="#任务" class="headerlink" title="任务"></a>任务</h5><p> 下面的命令将使用已知token初始化集群，以简化以下步骤</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">categories: rediskubeadm init --token=102952.1a7dd4cc8d1f4cc5 --kubernetes-version $(kubeadm version -o short)</span><br></pre></td></tr></table></figure>
+<p>在生产中，建议排除token，导致kubeadm代表您生成一个令牌。</p>
+<p> 要管理Kubernetes集群，需要客户端配置和证书。当kubeadm初始化集群时，将创建此配置。该命令将配置复制到用户主目录，并设置环境变量以供CLI使用。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo cp /etc/kubernetes/admin.conf $HOME/</span><br><span class="line">sudo chown $(id -u):$(id -g) $HOME/admin.conf</span><br><span class="line">export KUBECONFIG=$HOME/admin.conf</span><br></pre></td></tr></table></figure>
+<h4 id="Step-2-加入集群"><a href="#Step-2-加入集群" class="headerlink" title="Step 2 -加入集群"></a>Step 2 -加入集群</h4><p> Master初始化后，只要具有正确的token，其他节点就可以加入群集。例如，可以通过kubeadm令牌管理token</p>
+<h5 id="任务-1"><a href="#任务-1" class="headerlink" title="任务"></a>任务</h5><p>在第二个节点上，运行命令以加入提供主节点IP地址的群集。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm join --discovery-token-unsafe-skip-ca-verification --token=102952.1a7dd4cc8d1f4cc5 172.17.0.19:6443</span><br></pre></td></tr></table></figure>
+<p>这与Master初始化后提供的命令相同。</p>
+<p>这个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--discovery-token-unsafe-skip-ca-verification</span><br></pre></td></tr></table></figure>
+<p>tag用于绕过Discovery Token验证。由于此token是动态生成的，因此我们无法将其包含在步骤中。在生产中，使用kubeadm init提供的Token。</p>
+<h4 id="Step-3-访问节点"><a href="#Step-3-访问节点" class="headerlink" title="Step 3 - 访问节点"></a>Step 3 - 访问节点</h4><p>群集现已初始化。主节点将管理集群，而我们的一个工作节点将运行我们的容器工作负载。</p>
+<h5 id="任务-2"><a href="#任务-2" class="headerlink" title="任务"></a>任务</h5><p>Kubernetes CLI（称为kubectl）现在可以使用该配置来访问群集。例如，以下命令将返回群集中的两个节点。</p>
+<p>在master节点上</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get nodes</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>master $ kubectl get nodes<br>NAME      STATUS     ROLES     AGE       VERSION<br>master    NotReady   master    13m       v1.10.0<br>node01    NotReady   <none>    9m        v1.10.0 </none></p>
+</blockquote>
+<p><strong>此时，节点没有准备就绪.</strong></p>
+<p>这是因为尚未部署容器网络接口。这将在下一步中修复。</p>
+<h4 id="Step-4-部署容器网络接口-CNI"><a href="#Step-4-部署容器网络接口-CNI" class="headerlink" title="Step 4 -部署容器网络接口 (CNI)"></a>Step 4 -部署容器网络接口 (CNI)</h4><p>部署容器网络接口（Deploy Container Networking Interface ）定义了不同节点及其工作负载应如何通信。有多个网络提供商可用，其中一些已列出在<a href="https://kubernetes.io/docs/concepts/cluster-administration/addons/" target="_blank" rel="noopener">这里</a></p>
+<h5 id="任务-3"><a href="#任务-3" class="headerlink" title="任务"></a>任务</h5><p>在这种情况下，我们将使用WeaveWorks。可以在以下位置查看部署定义</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /opt/weave-kube</span><br></pre></td></tr></table></figure>
+<p>这可以使用<code>kubectl apply</code>进行部署。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f /opt/weave-kube</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>master $ kubectl apply -f /opt/weave-kube<br>serviceaccount “weave-net” created<br>clusterrole.rbac.authorization.k8s.io “weave-net” created<br>clusterrolebinding.rbac.authorization.k8s.io “weave-net” created<br>role.rbac.authorization.k8s.io “weave-net” created<br>rolebinding.rbac.authorization.k8s.io “weave-net” created<br>daemonset.extensions “weave-net” created</p>
+</blockquote>
+<p>Weave现在将作为一系列Pod部署在集群上。可以使用以下命令查看此状态</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get pod -n kube-system</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>master $ kubectl get pod -n kube-system<br>NAME                                             READY     STATUS    RESTARTS   AGE<br>etcd-master                                     1/1       Running          0          25m<br>kube-apiserver-master                       1/1       Running          0          25m<br>kube-controller-manager-master        1/1       Running          0          25m<br>kube-dns-86f4d74b45-c8q5w               3/3       Running          0          26m<br>kube-proxy-kqbsf                            1/1       Running          0          26m<br>kube-proxy-w44z4                           1/1       Running          0          22m<br>kube-scheduler-master                       1/1       Running          0          25m<br>weave-net-gn4w2                              2/2       Running          0          1m<br>weave-net-rm5n5                             2/2       Running           0          1m</p>
+</blockquote>
+<p>当在你的集群上安装Weave时，请访问<a href="https://www.weave.works/docs/net/latest/kube-addon/了解详细信息。" target="_blank" rel="noopener">https://www.weave.works/docs/net/latest/kube-addon/了解详细信息。</a></p>
+<h4 id="Step-5-部署pod"><a href="#Step-5-部署pod" class="headerlink" title="Step 5 - 部署pod"></a>Step 5 - 部署pod</h4><p>现在，群集中两个节点的状态应为Ready。这意味着我们的部署可以安排和启动。 使用Kubectl，可以部署pod。始终为主服务器发出命令，每个节点仅负责执行工作负载。 下面的命令基于Docker Image katacoda / docker-http-server创建一个Pod。</p>
+<blockquote>
+<p>master $ kubectl get nodes<br>NAME      STATUS    ROLES     AGE       VERSION<br>master    Ready     master    28m       v1.10.0<br>node01    Ready     <none>    24m       v1.10.0</none></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">master $ kubectl run http --image=katacoda/docker-http-server:latest --replicas=1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>master $ kubectl run http –image=katacoda/docker-http-server:latest –replicas=1</p>
+<p>deployment.apps “http” created</p>
+</blockquote>
+<p>可以使用<code>kubectl get pod</code>查看Pod创建的状态 ,</p>
+<blockquote>
+<p>master $ kubectl get pods<br>NAME                    READY     STATUS    RESTARTS   AGE<br>http-7b77c4cd66-k44l4   1/1       Running   0          1m</p>
+</blockquote>
+<p>运行后，可以看到节点上运行的Docker Container。</p>
+<p><img src="/2018/08/17/k8s集群初体验/docker-ps.png" alt=""></p>
+<h4 id="Step-6-部署dashboard"><a href="#Step-6-部署dashboard" class="headerlink" title="Step 6 - 部署dashboard"></a>Step 6 - 部署dashboard</h4><p>Kubernetes拥有基于Web的仪表板UI，可以查看Kubernetes集群。</p>
+<h5 id="任务-4"><a href="#任务-4" class="headerlink" title="任务"></a>任务</h5><p>使用命令部署仪表板yaml</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f dashboard.yaml</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>master $ kubectl apply -f dashboard.yaml<br>serviceaccount “kubernetes-dashboard” created<br>clusterrolebinding.rbac.authorization.k8s.io “kubernetes-dashboard” created<br>deployment.extensions “kubernetes-dashboard” created<br>service “kubernetes-dashboard” created<br>serviceaccount “admin-user” created<br>clusterrolebinding.rbac.authorization.k8s.io “admin-user” created</p>
+</blockquote>
+<p>仪表板部署到kube-system名称空间中。使用<code>kubectl get pods -n kube-system</code>查看部署状态。 Katacoda部署还创建了一个管理员用户，可用于根据文档登录仪表板。</p>
+<blockquote>
+<p>master $ kubectl get pods -n kube-system<br>NAME                                                  READY     STATUS    RESTARTS   AGE<br>etcd-master                                           1/1       Running          0          45m<br>kube-apiserver-master                        1/1       Running         0          45m<br>kube-controller-manager-master      1/1       Running         0          45m<br>kube-dns-86f4d74b45-c8q5w             3/3       Running         0          46m<br>kube-proxy-kqbsf                                  1/1       Running         0          46m<br>kube-proxy-w44z4                                 1/1       Running         0          42m<br>kube-scheduler-master                        1/1       Running         0          45m<br>weave-net-gn4w2                                   2/2       Running         0          21m<br>weave-net-rm5n5                                   2/2       Running         0          21m</p>
+</blockquote>
+<p>可以通过以下方式找到用户的token</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '&#123;print $1&#125;')</span><br></pre></td></tr></table></figure>
+<p>部署仪表板后，它使用externalIP将服务绑定到端口8443。</p>
+<p>这使得仪表板可以在集群外部使用，并且可以在<a href="https://2886795329-9090-cykoria01.environments.katacoda.com/上查看" target="_blank" rel="noopener">https://2886795329-9090-cykoria01.environments.katacoda.com/上查看</a></p>
+<p><img src="/2018/08/17/k8s集群初体验/dashboard.png" alt=""></p>
+<p>使用admin-user令牌访问仪表板。 对于生产而言，建议使用kubectl代理来访问仪表板，而不是externalIP。有关详细信息，请访问<a href="https://github.com/kubernetes/dashboard。" target="_blank" rel="noopener">https://github.com/kubernetes/dashboard。</a></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/08/17/k8s集群初体验/">使用Kubeadm启动多节点群集</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">zhqqqy</a></p>
+        <p><span>发布时间:</span>2018-08-17, 10:40:19</p>
+        <p><span>最后更新:</span>2018-08-17, 11:10:49</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/08/17/k8s集群初体验/" title="使用Kubeadm启动多节点群集">http://zhqqqy.github.io/2018/08/17/k8s集群初体验/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/08/17/k8s集群初体验/　　作者: zhqqqy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/08/17/使用Kubeadm启动多节点群集/">
+                    使用Kubeadm启动多节点群集
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#第1步-初始化Master"><span class="toc-number">1.</span> <span class="toc-text">第1步 - 初始化Master</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#任务"><span class="toc-number">1.1.</span> <span class="toc-text">任务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Step-2-加入集群"><span class="toc-number">2.</span> <span class="toc-text">Step 2 -加入集群</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#任务-1"><span class="toc-number">2.1.</span> <span class="toc-text">任务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Step-3-访问节点"><span class="toc-number">3.</span> <span class="toc-text">Step 3 - 访问节点</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#任务-2"><span class="toc-number">3.1.</span> <span class="toc-text">任务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Step-4-部署容器网络接口-CNI"><span class="toc-number">4.</span> <span class="toc-text">Step 4 -部署容器网络接口 (CNI)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#任务-3"><span class="toc-number">4.1.</span> <span class="toc-text">任务</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Step-5-部署pod"><span class="toc-number">5.</span> <span class="toc-text">Step 5 - 部署pod</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Step-6-部署dashboard"><span class="toc-number">6.</span> <span class="toc-text">Step 6 - 部署dashboard</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#任务-4"><span class="toc-number">6.1.</span> <span class="toc-text">任务</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"使用Kubeadm启动多节点群集　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/08/17/使用Kubeadm启动多节点群集/" title="下一篇: 使用Kubeadm启动多节点群集">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/17/k8s集群初体验/">使用Kubeadm启动多节点群集</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/17/使用Kubeadm启动多节点群集/">使用Kubeadm启动多节点群集</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/14/goroutine-scheduler/">goroutine scheduler</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 zhqqqy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
