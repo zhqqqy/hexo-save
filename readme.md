@@ -11,4 +11,3 @@ layout: "tags"
 
 
 type: "categories"
-layout: "categories-"
