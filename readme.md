@@ -11,6 +11,6 @@ layout: "tags"
 
 
 type: "categories"
-layout: "categories"
+layout: "categories。。"
 
 //测试
