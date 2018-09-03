@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="四娃" />
+
+
+
+<meta name="description" content="简介Lua 是一种轻量小巧的脚本语言，用标准C语言编写并以源代码形式开放， 其设计目的是为了嵌入应用程序中，从而为应用程序提供灵活的扩展和定制功能。。Lua是类C的，所以，他是大小写字符敏感的。 Lua 环境安装Linux 系统上安装Linux &amp;amp; Mac上安装 Lua 安装非常简单，只需要下载源码包并在终端解压编译即可。 12345wget https://www.lua.org/ftp">
+<meta name="keywords" content="lua">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lua-1">
+<meta property="og:url" content="http://zhqqqy.github.io/2018/08/27/lua-1/index.html">
+<meta property="og:site_name" content="zhqqqy">
+<meta property="og:description" content="简介Lua 是一种轻量小巧的脚本语言，用标准C语言编写并以源代码形式开放， 其设计目的是为了嵌入应用程序中，从而为应用程序提供灵活的扩展和定制功能。。Lua是类C的，所以，他是大小写字符敏感的。 Lua 环境安装Linux 系统上安装Linux &amp;amp; Mac上安装 Lua 安装非常简单，只需要下载源码包并在终端解压编译即可。 12345wget https://www.lua.org/ftp">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-27T02:50:13.548Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="lua-1">
+<meta name="twitter:description" content="简介Lua 是一种轻量小巧的脚本语言，用标准C语言编写并以源代码形式开放， 其设计目的是为了嵌入应用程序中，从而为应用程序提供灵活的扩展和定制功能。。Lua是类C的，所以，他是大小写字符敏感的。 Lua 环境安装Linux 系统上安装Linux &amp;amp; Mac上安装 Lua 安装非常简单，只需要下载源码包并在终端解压编译即可。 12345wget https://www.lua.org/ftp">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>lua-1 | zhqqqy</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">四娃</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux-系统分析/">Linux,系统分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL，SQL/">MySQL，SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/protobuf，google/">protobuf，google</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis-lua/">redis,lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-syn/">tcp ,syn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">四娃</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">四娃</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-lua-1" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/08/27/lua-1/" class="article-date">
+      <time datetime="2018-08-27T01:11:06.000Z" itemprop="datePublished">2018-08-27</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      lua-1
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/lua/">lua</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/lua/">lua</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Lua 是一种轻量小巧的脚本语言，用标准C语言编写并以源代码形式开放， 其设计目的是为了嵌入应用程序中，从而为应用程序提供灵活的扩展和定制功能。。Lua是类C的，所以，他是大小写字符敏感的。</p>
+<h1 id="Lua-环境安装"><a href="#Lua-环境安装" class="headerlink" title="Lua 环境安装"></a>Lua 环境安装</h1><h2 id="Linux-系统上安装"><a href="#Linux-系统上安装" class="headerlink" title="Linux 系统上安装"></a>Linux 系统上安装</h2><p>Linux &amp; Mac上安装 Lua 安装非常简单，只需要下载源码包并在终端解压编译即可。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https://www.lua.org/ftp/lua-5.3.5.tar.gz</span><br><span class="line">tar zxf lua-5.3.5.tar.gz</span><br><span class="line">cd lua-5.3.5/</span><br><span class="line">make linux test</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+<h1 id="编写Lua脚本的helloworld"><a href="#编写Lua脚本的helloworld" class="headerlink" title="编写Lua脚本的helloworld"></a>编写Lua脚本的helloworld</h1><p> Lua脚本的语句的分号是可选的，这个和GO语言很类似。</p>
+<ul>
+<li>在hello.lua中编写lua代码</li>
+</ul>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vim hello.lua</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Hello World"</span>)</span><br><span class="line">lua hello.lua</span><br></pre></td></tr></table></figure>
+<ul>
+<li>我们也可以将代码修改为如下形式来执行脚本（在开头添加：#!/usr/local/bin/lua）：</li>
+</ul>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/<span class="keyword">local</span>/bin/lua</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"Hello World！"</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">"www.runoob.com"</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod 766 hell.lua</span><br><span class="line">./hello.lua</span><br></pre></td></tr></table></figure>
+<ul>
+<li>你可以像python一样，在命令行上运行lua命令后进入lua的shell中执行语句。</li>
+</ul>
+<p>Lua 交互式编程模式可以通过命令 lua -i 或 lua 来启用：</p>
+<blockquote>
+<p>~ lua<br>Lua 5.3.5  Copyright (C) 1994-2018 Lua.org, PUC-Rio</p>
+<p>>print(“hello world”)</p>
+<p>hello world</p>
+</blockquote>
+<h1 id="Lua-基本语法"><a href="#Lua-基本语法" class="headerlink" title="Lua 基本语法"></a>Lua 基本语法</h1><h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><h3 id="单行注释"><a href="#单行注释" class="headerlink" title="单行注释"></a>单行注释</h3><p>两个减号是单行注释:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--</span><br></pre></td></tr></table></figure>
+<h3 id="多行注释"><a href="#多行注释" class="headerlink" title="多行注释"></a>多行注释</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">--[[</span><br><span class="line"> 多行注释</span><br><span class="line"> 多行注释</span><br><span class="line"> --]]</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="标示符"><a href="#标示符" class="headerlink" title="标示符"></a>标示符</h2><p>Lua 标示符用于定义一个变量，函数获取其他用户定义的项。标示符以一个字母 A 到 Z 或 a 到 z 或下划线 _ 开头后加上0个或多个字母，下划线，数字（0到9）。</p>
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p>以下列出了 Lua 的保留关键字。保留关键字不能作为常量或变量或其他用户自定义标示符：</p>
+<table>
+<thead>
+<tr>
+<th>and</th>
+<th>break</th>
+<th>do</th>
+<th>else</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>elseif</td>
+<td>end</td>
+<td>false</td>
+<td>for</td>
+</tr>
+<tr>
+<td>function</td>
+<td>if</td>
+<td>in</td>
+<td>local</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>not</td>
+<td>or</td>
+<td>repeat</td>
+</tr>
+<tr>
+<td>return</td>
+<td>then</td>
+<td>true</td>
+<td>until</td>
+</tr>
+<tr>
+<td>while</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>一般约定，以下划线开头连接一串大写字母的名字（比如 _VERSION）被保留用于 Lua 内部全局变量。</p>
+<h1 id="Lua-变量"><a href="#Lua-变量" class="headerlink" title="Lua 变量"></a>Lua 变量</h1><p><strong>Lua 变量有三种类型：全局变量、局部变量、表中的域。</strong></p>
+<h2 id="全局变量"><a href="#全局变量" class="headerlink" title="全局变量"></a>全局变量</h2><p>需要注意的是：lua中的变量如果没有特殊说明，全是全局变量，那怕是语句块或是函数里。变量前加<strong>local</strong>关键字的是局部变量。</p>
+<p>全局变量不需要声明，给一个变量赋值后即创建了这个全局变量，访问一个没有初始化的全局变量也不会出错，只不过得到的结果是：nil。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="built_in">print</span>(b)</span><br><span class="line"><span class="literal">nil</span></span><br><span class="line">&gt; b=<span class="number">10</span></span><br><span class="line">&gt; <span class="built_in">print</span>(b)</span><br><span class="line"><span class="number">10</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<p>如果你想删除一个全局变量，只需要将变量赋值为nil。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">b = <span class="literal">nil</span></span><br><span class="line"><span class="built_in">print</span>(b)      <span class="comment">--&gt; nil</span></span><br></pre></td></tr></table></figure>
+<p>这样变量b就好像从没被使用过一样。换句话说, 当且仅当一个变量不等于nil时，这个变量即存在。</p>
+<h2 id="控制语句"><a href="#控制语句" class="headerlink" title="控制语句"></a>控制语句</h2><h5 id="while循环"><a href="#while循环" class="headerlink" title="while循环"></a>while循环</h5><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sum = <span class="number">0</span></span><br><span class="line">num = <span class="number">1</span></span><br><span class="line"><span class="keyword">while</span> num &lt;= <span class="number">100</span> <span class="keyword">do</span></span><br><span class="line">    sum = sum + num</span><br><span class="line">    num = num + <span class="number">1</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"sum ="</span>,sum)</span><br></pre></td></tr></table></figure>
+<h5 id="if-else分支"><a href="#if-else分支" class="headerlink" title="if-else分支"></a>if-else分支</h5><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> age == <span class="number">40</span> <span class="keyword">and</span> sex ==<span class="string">"Male"</span> <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"男人四十一枝花"</span>)</span><br><span class="line"><span class="keyword">elseif</span> age &gt; <span class="number">60</span> <span class="keyword">and</span> sex ~=<span class="string">"Female"</span> <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"old man without country!"</span>)</span><br><span class="line"><span class="keyword">elseif</span> age &lt; <span class="number">20</span> <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">io</span>.<span class="built_in">write</span>(<span class="string">"too young, too naive!\n"</span>)</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="keyword">local</span> age = <span class="built_in">io</span>.<span class="built_in">read</span>()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Your age is "</span>..age)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>上面的语句不但展示了if-else语句，也展示了<br>1）“～=”是不等于，而不是!=<br>2）io库的分别从stdin和stdout读写的read和write函数<br>3）字符串的拼接操作符“..”</p>
+<p> <strong>（注意：Lua没有++或是+=这样的操作）</strong></p>
+<p>条件表达式中的与或非为分是：and, or, not关键字。</p>
+<h5 id="for-循环"><a href="#for-循环" class="headerlink" title="for 循环"></a>for 循环</h5><p>从1加到100</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sum = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i = <span class="number">1</span>, <span class="number">100</span> <span class="keyword">do</span></span><br><span class="line">    sum = sum + i</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>从1到100的奇数和</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sum = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i=<span class="number">1</span>,<span class="number">100</span>,<span class="number">2</span> <span class="keyword">do</span></span><br><span class="line">	sum = sum +i</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>从100到1的偶数和</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sum = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> i = <span class="number">100</span>, <span class="number">1</span>, <span class="number">-2</span> <span class="keyword">do</span></span><br><span class="line">    sum = sum + i</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h5 id="until循环"><a href="#until循环" class="headerlink" title="until循环"></a>until循环</h5> <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sum = <span class="number">2</span></span><br><span class="line"><span class="keyword">repeat</span></span><br><span class="line">   sum = sum ^ <span class="number">2</span> <span class="comment">--幂操作</span></span><br><span class="line">   <span class="built_in">print</span>(sum)</span><br><span class="line"><span class="keyword">until</span> sum &gt;<span class="number">1000</span></span><br></pre></td></tr></table></figure>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><p>Lua的函数和Javascript的很像</p>
+<h3 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h3><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fib</span><span class="params">(n)</span></span></span><br><span class="line">  <span class="keyword">if</span> n &lt; <span class="number">2</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">return</span> fib(n - <span class="number">2</span>) + fib(n - <span class="number">1</span>)</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h3 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h3><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">newCounter</span><span class="params">()</span></span></span><br><span class="line">    <span class="keyword">local</span> i = <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span><span class="params">()</span></span>     <span class="comment">-- anonymous function</span></span><br><span class="line">       i = i + <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> i</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"> </span><br><span class="line">c1 = newCounter()</span><br><span class="line"><span class="built_in">print</span>(c1())  <span class="comment">--&gt; 1</span></span><br><span class="line"><span class="built_in">print</span>(c1())  <span class="comment">--&gt; 2</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/08/27/lua-1/">lua-1</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">四娃</a></p>
+        <p><span>发布时间:</span>2018-08-27, 09:11:06</p>
+        <p><span>最后更新:</span>2018-08-27, 10:50:13</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/08/27/lua-1/" title="lua-1">http://zhqqqy.github.io/2018/08/27/lua-1/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/08/27/lua-1/　　作者: 四娃" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+            <div id="article-nav-newer" class="article-nav-title">
+                <a href="/2018/08/27/redis-eval/">
+                    redis-eval
+                </a>
+            </div>
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/08/23/mysql深入/">
+                    mysql深入
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Lua-环境安装"><span class="toc-number">2.</span> <span class="toc-text">Lua 环境安装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Linux-系统上安装"><span class="toc-number">2.1.</span> <span class="toc-text">Linux 系统上安装</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#编写Lua脚本的helloworld"><span class="toc-number">3.</span> <span class="toc-text">编写Lua脚本的helloworld</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Lua-基本语法"><span class="toc-number">4.</span> <span class="toc-text">Lua 基本语法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#注释"><span class="toc-number">4.1.</span> <span class="toc-text">注释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#单行注释"><span class="toc-number">4.1.1.</span> <span class="toc-text">单行注释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多行注释"><span class="toc-number">4.1.2.</span> <span class="toc-text">多行注释</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#标示符"><span class="toc-number">4.2.</span> <span class="toc-text">标示符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关键词"><span class="toc-number">4.3.</span> <span class="toc-text">关键词</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Lua-变量"><span class="toc-number">5.</span> <span class="toc-text">Lua 变量</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#全局变量"><span class="toc-number">5.1.</span> <span class="toc-text">全局变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#控制语句"><span class="toc-number">5.2.</span> <span class="toc-text">控制语句</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#while循环"><span class="toc-number">5.2.0.0.1.</span> <span class="toc-text">while循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#if-else分支"><span class="toc-number">5.2.0.0.2.</span> <span class="toc-text">if-else分支</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#for-循环"><span class="toc-number">5.2.0.0.3.</span> <span class="toc-text">for 循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#until循环"><span class="toc-number">5.2.0.0.4.</span> <span class="toc-text">until循环</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#函数"><span class="toc-number">5.3.</span> <span class="toc-text">函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#递归"><span class="toc-number">5.3.1.</span> <span class="toc-text">递归</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#闭包"><span class="toc-number">5.3.2.</span> <span class="toc-text">闭包</span></a></li></ol></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"lua-1　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/08/27/redis-eval/" title="上一篇: redis-eval">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/08/23/mysql深入/" title="下一篇: mysql深入">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/31/docker1-入门/">docker1-入门</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/TCP-SYN/">TCP-SYN</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/protobuf/">protobuf</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/redis-eval/">redis-eval</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/lua-1/">lua-1</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/mysql深入/">mysql深入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Linux下性能分析工具/">Linux下性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/14/goroutine-scheduler/">goroutine scheduler</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 四娃
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>

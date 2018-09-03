@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="四娃" />
+
+
+
+<meta name="description" content="docker组成docker 分为镜像，容器，仓库三部分。  仓库：可以说是类似是github一样的东西，github是存放代码的地方，dockerhub是存放docker镜像的地方 镜像：可以认为是我们的源代码，可以根据源代码编译成执行文件(容器) 容器：可以类比是各类软件(软件由代码编译，容器由镜像编译成)，由docker镜像生成。  docker安装docker现在分为ce和ee版本 ce(">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker1-入门">
+<meta property="og:url" content="http://zhqqqy.github.io/2018/08/31/docker1-入门/index.html">
+<meta property="og:site_name" content="zhqqqy">
+<meta property="og:description" content="docker组成docker 分为镜像，容器，仓库三部分。  仓库：可以说是类似是github一样的东西，github是存放代码的地方，dockerhub是存放docker镜像的地方 镜像：可以认为是我们的源代码，可以根据源代码编译成执行文件(容器) 容器：可以类比是各类软件(软件由代码编译，容器由镜像编译成)，由docker镜像生成。  docker安装docker现在分为ce和ee版本 ce(">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-03T03:02:43.812Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="docker1-入门">
+<meta name="twitter:description" content="docker组成docker 分为镜像，容器，仓库三部分。  仓库：可以说是类似是github一样的东西，github是存放代码的地方，dockerhub是存放docker镜像的地方 镜像：可以认为是我们的源代码，可以根据源代码编译成执行文件(容器) 容器：可以类比是各类软件(软件由代码编译，容器由镜像编译成)，由docker镜像生成。  docker安装docker现在分为ce和ee版本 ce(">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="zhqqqy" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>docker1-入门 | zhqqqy</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">四娃</a></h1>
+        </hgroup>
+
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="true" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux-系统分析/">Linux,系统分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL，SQL/">MySQL，SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/codis/">codis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/protobuf，google/">protobuf，google</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis-lua/">redis,lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tcp-syn/">tcp ,syn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">四娃</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">四娃</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:zhq568405944@gmail.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="https://github.com/zhqqqy" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-docker1-入门" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/08/31/docker1-入门/" class="article-date">
+      <time datetime="2018-08-31T06:22:43.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      docker1-入门
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/docker/">docker</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="docker组成"><a href="#docker组成" class="headerlink" title="docker组成"></a>docker组成</h2><p>docker 分为<strong>镜像</strong>，<strong>容器</strong>，<strong>仓库</strong>三部分。</p>
+<ul>
+<li>仓库：可以说是类似是github一样的东西，github是存放代码的地方，dockerhub是存放docker镜像的地方</li>
+<li>镜像：可以认为是我们的源代码，可以根据源代码编译成执行文件(容器)</li>
+<li>容器：可以类比是各类软件(软件由代码编译，容器由镜像编译成)，由docker镜像生成。</li>
+</ul>
+<h2 id="docker安装"><a href="#docker安装" class="headerlink" title="docker安装"></a>docker安装</h2><p>docker现在分为ce和ee版本</p>
+<p>ce(community-edition)版本是社区办，ee(enterprise-edition)是企业版</p>
+<table>
+<thead>
+<tr>
+<th>社区版</th>
+<th>企业版基本</th>
+<th>企业版标准</th>
+<th>企业版高级</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>容器引擎,built in orchestration, 网络, 安全</td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>Docker认证的基础架构，插件和ISV容器</td>
+<td></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>image管理(私有docker registry, caching)</td>
+<td>Cloud hosted repos</td>
+<td></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>Docker数据中心(集成容器应用程序管理)</td>
+<td></td>
+<td></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>Docker数据中心(RBAC, LDAP/AD support)</td>
+<td></td>
+<td></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>集成加密管理，镜像签名策略(Integrated secrets mgmt, image signing policy)</td>
+<td></td>
+<td></td>
+<td><code>yes</code></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>镜像安全扫描(Image security scanning)</td>
+<td>Preview</td>
+<td></td>
+<td></td>
+<td><code>yes</code></td>
+</tr>
+<tr>
+<td>Support</td>
+<td>Community Support</td>
+<td>Business Day or Business Critical</td>
+<td>Business Day or Business Critical</td>
+<td>Business Day or Business Critical</td>
+</tr>
+<tr>
+<td></td>
+<td>免费</td>
+<td>750$/年</td>
+<td>1500$/年</td>
+<td>2000$/年</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Ubuntu-安装-Docker-CE"><a href="#Ubuntu-安装-Docker-CE" class="headerlink" title="Ubuntu 安装 Docker CE"></a>Ubuntu 安装 Docker CE</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install docker</span><br></pre></td></tr></table></figure>
+<h3 id="启动-Docker-CE"><a href="#启动-Docker-CE" class="headerlink" title="启动 Docker CE"></a>启动 Docker CE</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl <span class="built_in">enable</span> docker</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo systemctl start docker</span></span><br></pre></td></tr></table></figure>
+<h3 id="建立-docker-用户组"><a href="#建立-docker-用户组" class="headerlink" title="建立 docker 用户组"></a>建立 docker 用户组</h3><p>默认情况下，<code>docker</code> 命令会使用 <a href="https://en.wikipedia.org/wiki/Unix_domain_socket" target="_blank" rel="noopener">Unix socket</a> 与 Docker 引擎通讯。而只有 <code>root</code> 用户和 <code>docker</code> 组的用户才可以访问 Docker 引擎的 Unix socket。出于安全考虑，一般 Linux 系统上不会直接使用 <code>root</code> 用户。因此，更好地做法是将需要使用 <code>docker</code> 的用户加入 <code>docker</code> 用户组。</p>
+<p>建立 <code>docker</code> 组：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo groupadd docker</span><br></pre></td></tr></table></figure>
+<p>将当前用户加入 <code>docker</code> 组：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo usermod -aG docker $USER</span><br></pre></td></tr></table></figure>
+<h3 id="镜像加速"><a href="#镜像加速" class="headerlink" title="镜像加速"></a>镜像加速</h3><p>鉴于国内网络问题，后续拉取 Docker 镜像十分缓慢，强烈建议安装 Docker 之后配置 <a href="https://yeasy.gitbooks.io/docker_practice/install/mirror.html" target="_blank" rel="noopener">国内镜像加速</a>。</p>
+<p><a href="https://dev.aliyun.com/search.html" target="_blank" rel="noopener">阿里云镜像仓库</a> </p>
+<h2 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h2><h3 id="获取镜像"><a href="#获取镜像" class="headerlink" title="获取镜像"></a>获取镜像</h3><p>从 Docker 镜像仓库获取镜像的命令是 <code>docker pull</code>。其命令格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]</span><br></pre></td></tr></table></figure>
+<p>具体的选项可以通过 <code>docker pull --help</code> 命令看到。</p>
+<ul>
+<li>Docker 镜像仓库地址：地址的格式一般是 <code>&lt;域名/IP&gt;[:端口号]</code>。默认地址是 Docker Hub。</li>
+<li>仓库名：如之前所说，这里的仓库名是两段式名称，即 <code>&lt;用户名&gt;/&lt;软件名&gt;</code>。对于 Docker Hub，如果不给出用户名，则默认为 <code>library</code>，也就是官方镜像。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sudo docker pull redis</span><br><span class="line">Using default tag: latest</span><br><span class="line">latest: Pulling from library/redis</span><br><span class="line">be8881be8156: Already exists </span><br><span class="line">d6f5ea773ca3: Pull complete </span><br><span class="line">735cc65c0db4: Pull complete </span><br><span class="line">787dddf99946: Pull complete </span><br><span class="line">0733799a7c0a: Pull complete </span><br><span class="line">6d250f04811a: Pull complete </span><br><span class="line">Digest: sha256:858b1677143e9f8455821881115e276f6177221de1c663d0abef9b2fda02d065</span><br><span class="line">Status: Downloaded newer image for redis:latest</span><br></pre></td></tr></table></figure>
+<p>如果docker pull没有给出镜像地址，就会默认从docker hub下下载镜像</p>
+<h3 id="列出镜像"><a href="#列出镜像" class="headerlink" title="列出镜像"></a>列出镜像</h3><p>可以通过<code>docker image</code>来查看本地有哪些镜像</p>
+<blockquote>
+<p>~$ sudo docker images<br>REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE<br>wordpress           latest              3745a1731caf        40 hours ago        408MB<br>mysql               latest              29e0ae3b69b9        2 weeks ago         484MB<br>redis               latest              4e8db158f18d        3 weeks ago         83.4MB<br>列表包含了 <code>仓库名</code>、<code>标签</code>、<code>镜像 ID</code>、<code>创建时间</code> 以及 <code>所占用的空间</code>。</p>
+</blockquote>
+<h4 id="虚悬镜像"><a href="#虚悬镜像" class="headerlink" title="虚悬镜像"></a>虚悬镜像</h4><p>有时候有些镜像显示的是<code>&lt;none&gt;</code>。：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;none&gt;               &lt;none&gt;              00285df0df87        5 days ago          342 MB</span><br></pre></td></tr></table></figure>
+<p>这个镜像原本是有镜像名和标签的，原来为 <code>mongo:3.2</code>，随着官方镜像维护，发布了新版本后，重新 <code>docker pull mongo:3.2</code> 时，<code>mongo:3.2</code> 这个镜像名被转移到了新下载的镜像身上，而旧的镜像上的这个名称则被取消，从而成为了 <code>&lt;none&gt;</code>。除了 <code>docker pull</code> 可能导致这种情况，<code>docker build</code> 也同样可以导致这种现象。由于新旧镜像同名，旧镜像名称被取消，从而出现仓库名、标签均为 <code>&lt;none&gt;</code> 的镜像。这类无标签镜像也被称为 <strong>虚悬镜像(dangling image)</strong> ，可以用下面的命令专门显示这类镜像：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker images -f dangling=true</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">&lt;none&gt;              &lt;none&gt;              00285df0df87        5 days ago          342 MB</span><br></pre></td></tr></table></figure>
+<p>一般来说，虚悬镜像已经失去了存在的价值，是可以随意删除的，可以用下面的命令删除。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker image prune</span><br></pre></td></tr></table></figure>
+<h4 id="中间层镜像"><a href="#中间层镜像" class="headerlink" title="中间层镜像"></a>中间层镜像</h4><p>为了加速镜像构建、重复利用资源，Docker 会利用 <strong>中间层镜像</strong>。所以在使用一段时间后，可能会看到一些依赖的中间层镜像。默认的 <code>docker image ls</code> 列表中只会显示顶层镜像，如果希望显示包括中间层镜像在内的所有镜像的话，需要加 <code>-a</code> 参数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker image ls -a</span><br></pre></td></tr></table></figure>
+<p>这样会看到很多无标签的镜像，与之前的虚悬镜像不同，这些无标签的镜像很多都是中间层镜像，是其它镜像所依赖的镜像。这些无标签镜像不应该删除，否则会导致上层镜像因为依赖丢失而出错。实际上，这些镜像也没必要删除，因为之前说过，相同的层只会存一遍，而这些镜像是别的镜像的依赖，因此并不会因为它们被列出来而多存了一份，无论如何你也会需要它们。只要删除那些依赖它们的镜像后，这些依赖的中间层镜像也会被连带删除。 </p>
+<h3 id="删除本地镜像"><a href="#删除本地镜像" class="headerlink" title="删除本地镜像"></a>删除本地镜像</h3><p>如果要删除本地的镜像，可以使用 <code>docker image rm</code> 命令或者<code>docker rmi</code>，其格式为：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker image rm [选项] &lt;镜像1&gt; [&lt;镜像2&gt; ...]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rmi [选项] &lt;镜像1&gt; [&lt;镜像2&gt; ...]</span><br></pre></td></tr></table></figure>
+<h4 id="用-ID、镜像名、摘要删除镜像"><a href="#用-ID、镜像名、摘要删除镜像" class="headerlink" title="用 ID、镜像名、摘要删除镜像"></a>用 ID、镜像名、摘要删除镜像</h4><p>其中，<code>&lt;镜像&gt;</code> 可以是 <code>镜像短 ID</code>、<code>镜像长 ID</code>、<code>镜像名</code> 或者 <code>镜像摘要</code>。</p>
+<p><code>sudo docker rmi 3745a1731caf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Untagged: centos:latest</span><br><span class="line">Untagged: centos@sha256:b2f9d1c0ff5f87a4743104d099a3d561002ac500db1b9bfa02a783a46e0d366c</span><br><span class="line">Deleted: sha256:0584b3d2cf6d235ee310cf14b54667d889887b838d3f3d3033acd70fc3c48b8a</span><br><span class="line">Deleted: sha256:97ca462ad9eeae25941546209454496e1d66749d53dfa2ee32bf1faabd239d38</span><br></pre></td></tr></table></figure>
+<h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><h3 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h3><p>有了镜像后，我们就能够以这个镜像为基础启动并运行一个容器。</p>
+<p><code>docker run --name redis_test -p 6379:6379 -d redis</code></p>
+<blockquote>
+<p>~$ sudo docker run –name redis_test -p 6379:6379 -d redis<br>5d0fde30bedc6192e77b75bbb8a5a9894b593f7eb58411f0b96a2270872445da</p>
+</blockquote>
+<blockquote>
+<p>~$ sudo docker ps<br>CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS    NAMES<br>5d0fde30bedc        redis               “docker-entrypoint.s…”   45 seconds ago      Up 38 seconds       0.0.0.0:6379-&gt;6379/tcp   redis_test</p>
+</blockquote>
+<p><code>docker run</code>就是运行容器的命令,运行他的时候可以带一些参数，详细可以通过<code>docke run --help</code></p>
+<ul>
+<li><code>--rm</code>：这个参数是说容器退出后随之将其删除。默认情况下，为了排障需求，退出的容器并不会立即删除，除非手动 <code>docker rm</code>。</li>
+<li><code>redis</code>：这是指用 <code>redis</code> 镜像为基础来启动容器。</li>
+<li><code>--name</code>:为容器指定名称。</li>
+<li><code>-p</code>:将容器的端口发布到主机.这里就是讲reids容器的6379端口映射到主机上的6379端口(<strong>ip:hostPort:containerPort</strong>)</li>
+<li><code>-d</code>:在后台运行容器并打印容器ID</li>
+</ul>
+<h3 id="进入容器内部"><a href="#进入容器内部" class="headerlink" title="进入容器内部"></a>进入容器内部</h3><p>进入redis容器内部，运行redis-cli，来操作redis:</p>
+<p><code>docker exec -it containerid  /bin/bash</code></p>
+<ul>
+<li><p><code>exec</code>:在正在运行的容器中运行命令</p>
+</li>
+<li><p><code>-it</code>：这是两个参数，一个是 <code>-i</code>：交互式操作，保证容器中stdin(一般指键盘输入到缓冲区里的东西)是开放的，一个是 <code>-t</code> ：告诉docker为要创建的容器分配一个伪tty终端。这样，新创建的容器才能够提供一个交互式shell</p>
+</li>
+<li><p><code>bash</code>：放在容器id后的是<strong>命令</strong>，这里我们希望有个交互式 Shell，因此用的是 <code>bash</code>。</p>
+</li>
+</ul>
+<blockquote>
+<p>~$ sudo docker exec -it 5d0fde30bedc /bin/bash<br>root@5d0fde30bedc:/data# redis-cli<br>127.0.0.1:6379&gt; set test value<br>OK<br>127.0.0.1:6379&gt; get test<br>“value”<br>127.0.0.1:6379&gt; </p>
+</blockquote>
+<p>想要退出就按<code>ctrl+d</code></p>
+<h3 id="停止，删除容器"><a href="#停止，删除容器" class="headerlink" title="停止，删除容器"></a>停止，删除容器</h3><ol>
+<li><strong>停止容器运行</strong>：<code>docker stop containerid</code></li>
+<li><strong>删除容器</strong>：<code>docker rm containerid</code>   删除容器必须要先将容器停止之后.</li>
+<li><strong>删除所有容器</strong>:   <em>docker rm `sudo docker ps -a -q`</em></li>
+</ol>
+<h3 id="启动，重启容器"><a href="#启动，重启容器" class="headerlink" title="启动，重启容器"></a>启动，重启容器</h3><ol>
+<li><p><strong>启动已经停止运行的容器</strong>：<code>docker start containername</code>或者通过id启动<code>docker start containerid</code></p>
+</li>
+<li><p><strong>重启容器</strong>:<code>docker restart containername</code>或者<code>docker restart containerid</code></p>
+</li>
+<li><p><strong>自动重启容器</strong>：</p>
+<p>如果容器因为某种错误而导致了容器停止运行，还可以通过<code>--restart</code>标志，让docker自动重新启动该容器。<code>--restart</code>标志会检查容器的退出代码，并根据此来决定是否要重启容器。默认的行为是docker不会容器容器。</p>
+<p><strong>–restart</strong>:参数：</p>
+<p><code>always</code>:无论容器的退出代码是什么，docker 都会自动重启该容器，</p>
+<p><code>on-failure</code>:只有当容器退出的代码是非0值的时候，才会自动重启，on-failure可以接受一个可选的重启次数参数，如<code>--restart=on-failure:5</code>.这样，当容器退出代码为非0的时候，docker会尝试自动重启该容器，最多重启5此</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/08/31/docker1-入门/">docker1-入门</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">四娃</a></p>
+        <p><span>发布时间:</span>2018-08-31, 14:22:43</p>
+        <p><span>最后更新:</span>2018-09-03, 11:02:43</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/08/31/docker1-入门/" title="docker1-入门">http://zhqqqy.github.io/2018/08/31/docker1-入门/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://zhqqqy.github.io/2018/08/31/docker1-入门/　　作者: 四娃" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/08/27/TCP-SYN/">
+                    TCP-SYN
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#docker组成"><span class="toc-number">1.</span> <span class="toc-text">docker组成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#docker安装"><span class="toc-number">2.</span> <span class="toc-text">docker安装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ubuntu-安装-Docker-CE"><span class="toc-number">2.1.</span> <span class="toc-text">Ubuntu 安装 Docker CE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动-Docker-CE"><span class="toc-number">2.2.</span> <span class="toc-text">启动 Docker CE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#建立-docker-用户组"><span class="toc-number">2.3.</span> <span class="toc-text">建立 docker 用户组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#镜像加速"><span class="toc-number">2.4.</span> <span class="toc-text">镜像加速</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#镜像"><span class="toc-number">3.</span> <span class="toc-text">镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#获取镜像"><span class="toc-number">3.1.</span> <span class="toc-text">获取镜像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#列出镜像"><span class="toc-number">3.2.</span> <span class="toc-text">列出镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#虚悬镜像"><span class="toc-number">3.2.1.</span> <span class="toc-text">虚悬镜像</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#中间层镜像"><span class="toc-number">3.2.2.</span> <span class="toc-text">中间层镜像</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#删除本地镜像"><span class="toc-number">3.3.</span> <span class="toc-text">删除本地镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#用-ID、镜像名、摘要删除镜像"><span class="toc-number">3.3.1.</span> <span class="toc-text">用 ID、镜像名、摘要删除镜像</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#容器"><span class="toc-number">4.</span> <span class="toc-text">容器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#运行容器"><span class="toc-number">4.1.</span> <span class="toc-text">运行容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#进入容器内部"><span class="toc-number">4.2.</span> <span class="toc-text">进入容器内部</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#停止，删除容器"><span class="toc-number">4.3.</span> <span class="toc-text">停止，删除容器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动，重启容器"><span class="toc-number">4.4.</span> <span class="toc-text">启动，重启容器</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"docker1-入门　| zhqqqy　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/08/27/TCP-SYN/" title="下一篇: TCP-SYN">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/31/docker1-入门/">docker1-入门</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/TCP-SYN/">TCP-SYN</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/protobuf/">protobuf</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/redis-eval/">redis-eval</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/27/lua-1/">lua-1</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/mysql深入/">mysql深入</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/23/Linux下性能分析工具/">Linux下性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/14/goroutine-scheduler/">goroutine scheduler</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/Go里面的堆栈跟踪/">Go里面的堆栈跟踪</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/13/Consul安装部署/">Consul安装部署</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/12/微服务初探/">微服务初探</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/29/redis集群安装/">redis集群安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/12/codis安装及配置/">codis安装及配置</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/23/Go性能分析工具/">Go性能分析工具</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/16/golang-http包/">golang-http包</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/23/Go单元测试/">Go单元测试</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/15/defer和追踪/">defer和追踪</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2016-2018 四娃
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+             title: "a.article-title, .article-more-link a", 
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+    <script>
+        var originTitle = document.title;
+        var titleTime;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+                clearTimeout(titleTime);
+            }
+            else {
+                document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+                titleTime = setTimeout(function() {
+                    document.title = originTitle;
+                }, 2000);
+            }
+        })
+    </script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
