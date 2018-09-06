@@ -132,9 +132,42 @@ MAINTAINER这条指令告诉docker镜像的作者以及电子邮件，方便联�
 
 `MAINTAINER zhqqqy "123@gmail.com"`
 
-## ENV 环境变量
+## ENV
 
-设置一个名字为REFRESHED_AT的环境变量，这个环境变量用来表明模板最后创建时间
+ENV是在build的时候，可以定义一些变数，让后面指令在执行时候可以参考...
 
-`ENV REFRESHED_AT 2014-07-01`
+```
+From resin/rpi-raspbian
+ENV NODE_VER=node-v5.9.1-linux-armv7l
+ADD ./${NODE_VER} /
+RUN ln -s /${NODE_VER} /node
+ENV PATH=/node/bin:$PATH
+CMD ["node"]
+```
 
+上面Dockerfile的第二行，定义NODE_VER变数，让第三行中的ADD参考，因此ADD会在执行时间，使用ENV所定义的值来做ADD的动作。
+
+注意：在Dockerfile中若没有第二行的指定，则第三行会参考到空字串。
+
+## ARG
+
+ARG在build时候是可以从外部以--build-arg带入的变数，让build的动作可结合外部的指令给定一些建构时候所需的参数...（ARG参数只在docker build的时候存在，docker run的时候不存在了，所以，在docker build的时候可以使用${}）
+
+```
+From resin/rpi-raspbian
+ARG NODE_VER
+ADD ./${NODE_VER:-node-v5.9.1-linux-armv7l} /
+RUN ln -s /${NODE_VER} /node
+ENV PATH=/node/bin:$PATH
+CMD ["node"]
+```
+
+上面Dockerfile在第二行的部分，会指定一个NODE_VER的变数，而在第三行时候，会引用该变数在本地端找到指令列所指定的字串目录进行复制到根目录(node-v5.9.0 -linux-armv7l)，如果未给定时候，则是以预设的node-v5.9.1-linux-armv7l为值...
+
+Build的时候，可以这样下参数：
+
+```
+docker build --build-arg NODE_VER=node-v5.9.0-linux-armv7l .
+```
+
+ 
